@@ -13,9 +13,9 @@ def call_ollama(prompt: str, model: str = "qwen2.5:0.5b", stream: bool = False) 
 def _build_prompt(story_text: str, style: str) -> str:
     return f"""
 你是一个故事分镜与旁白生成器（生成 JSON）。
-根据下列故事和风格，输出 JSON 数组 shots，每个元素包含:
+根据下列故事和风格，输出 JSON 数组 shots，包含至少3个分镜，每个分镜包含:
 scene（场景标题）, prompt（用于文生图的英文 Prompt）, narration（旁白文本）, bgm（音乐风格建议）。
-全部内容使用英文输出，只返回 JSON，不要其他多余说明。
+全部内容使用英文输出，只返回 JSON，不要其他多余说明。再次强调，只返回JSON数组。
 
 故事:
 {story_text}
