@@ -3,12 +3,13 @@ import logging
 from io import BytesIO
 
 from fastapi import FastAPI, HTTPException, Response
-import uvicorn
 
 from app.schemas.llm_schema import StoryboardRequest, StoryboardResponse
 from app.schemas.text2img_schema import Text2ImageRequest
 from app.services.llm_services import generate_storyboard
 from app.services.sd_service import generate_image
+from app.schemas.tts_schema import TTSRequest
+from app.services.tts_services import cosyvoice_tts
 from app.utils.logger import setup_logging
 
 setup_logging()
@@ -40,4 +41,16 @@ def text2image_api(req: Text2ImageRequest):
         return Response(content=buf.getvalue(), media_type="image/jpeg")
     except Exception as e:
         logger.exception("Image generation failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/tts")
+def tts_api(req: TTSRequest):
+    """
+    将旁白文本转换为语音 (mp3/wav)。
+    """
+    try:
+        audio_bytes, mime = cosyvoice_tts(tts_text=req.tts_text, spk_id=req.spk_id)
+        return Response(content=audio_bytes, media_type=mime)
+    except Exception as e:
+        logger.exception("TTS failed")
         raise HTTPException(status_code=500, detail=str(e))
