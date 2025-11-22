@@ -2,13 +2,15 @@
 import logging
 from io import BytesIO
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Form
+from starlette.responses import FileResponse
 
 from app.schemas.llm_schema import StoryboardRequest, StoryboardResponse
 from app.schemas.text2img_schema import Text2ImageRequest
 from app.services.llm_services import generate_storyboard
 from app.services.sd_service import generate_image
 from app.schemas.tts_schema import TTSRequest
+from app.services.svd_services import generate_video_from_frames
 from app.services.tts_services import cosyvoice_tts
 from app.utils.logger import setup_logging
 
@@ -54,3 +56,10 @@ def tts_api(req: TTSRequest):
     except Exception as e:
         logger.exception("TTS failed")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/img2video")
+def image2video_api(images: list[UploadFile] = File(...),
+    transition: str = Form("fade"),
+    fps: int = Form(10)):
+    output_path = generate_video_from_frames(images, transition, fps)
+    return FileResponse(output_path, media_type="video/mp4")

@@ -12,3 +12,4 @@ pillow
 python-multipart
 hf_xet
 ollama
+moviepy

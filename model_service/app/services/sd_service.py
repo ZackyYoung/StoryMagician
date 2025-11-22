@@ -7,7 +7,7 @@ def generate_image(prompt: str, style: str = None, width: int = 512, height: int
     """
     返回 PIL.Image
     """
-    model = AutoPipelineForText2Image.from_pretrained("stabilityai/sd-turbo", dtype=torch.float16, local_files_only=True)
+    model = AutoPipelineForText2Image.from_pretrained("stabilityai/sd-turbo", torch_dtype=torch.float16, local_files_only=True).to(device="cuda")
 
     full_prompt = f"{prompt}, {style} style"
 
