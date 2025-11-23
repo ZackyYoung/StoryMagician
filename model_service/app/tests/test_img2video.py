@@ -5,11 +5,12 @@ if __name__ == '__main__':
 
     files = [
         ('images', ('shot1.jpg', open('./test_images/shot1.jpg', 'rb'), 'image/jpeg')),
-        ('images', ('shot2.jpg', open('./test_images/shot2.jpg', 'rb'), 'image/jpeg'))
+        ('images', ('shot2.jpg', open('./test_images/shot2.jpg', 'rb'), 'image/jpeg')),
+        ('images', ('shot3.jpg', open('./test_images/shot3.jpg', 'rb'), 'image/jpeg'))
     ]
 
     data = {
-        "transition": "none",
+        "transition": "fade",
         "fps": 10
     }
 

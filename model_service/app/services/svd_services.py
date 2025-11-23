@@ -5,14 +5,13 @@ import uuid
 
 import numpy as np
 import torch
-from moviepy import ImageClip, concatenate_videoclips, VideoFileClip, VideoClip, ColorClip
+from moviepy import ImageClip, concatenate_videoclips, VideoFileClip, VideoClip, ColorClip, CompositeVideoClip
+from moviepy.video.fx import CrossFadeIn, SlideIn, SlideOut, CrossFadeOut
 from moviepy.video.fx.FadeIn import FadeIn
 from moviepy.video.fx.FadeOut import FadeOut
 from diffusers import StableVideoDiffusionPipeline
 from PIL import Image
-from tempfile import TemporaryDirectory
 
-from torch.distributed.tensor.experimental import local_map
 
 logger = logging.getLogger(__name__)
 
@@ -92,51 +91,14 @@ def concat_with_transition(clips, transition):
         # 为每个片段添加淡入淡出效果
         processed_clips = []
         for clip in clips:
-            # 添加淡入效果
-            faded_clip = FadeIn(clip)
-            # 添加淡出效果
-            faded_clip = FadeOut(faded_clip)
+            faded_clip = clip
+            if len(processed_clips) > 0:
+                faded_clip = FadeIn(0.5).apply(faded_clip)
+            if len(processed_clips) < len(clips) - 1:
+                faded_clip = FadeOut(0.5).apply(faded_clip)
             processed_clips.append(faded_clip)
 
         return concatenate_videoclips(processed_clips, method="compose")
 
-    if transition == "crossfade":
-        result = clips[0]
-        for c in clips[1:]:
-            result = result.crossfadein(0.5)
-            result = concatenate_videoclips(
-                [result, c],
-                method="compose",
-                padding=-0.5
-            )
-        return result
-
-    if transition == "slide":
-        # 左滑动画
-        final = clips[0]
-        for c in clips[1:]:
-            final = concatenate_videoclips(
-                [final, c.set_start(final.duration).fx(slide_in, duration=0.6)],
-                method="compose"
-            )
-        return final
 
     return concatenate_videoclips(clips, method="compose")
-
-def slide_in(clip, duration=0.6, direction="left"):
-    w, h = clip.size
-
-    def make_frame(t):
-        frame = clip.get_frame(t)
-        offset = int(w * (1 - min(t / duration, 1.0)))
-
-        canvas = np.zeros_like(frame)
-
-        if direction == "left":
-            canvas[:, :w - offset] = frame[:, offset:]
-        else:
-            canvas[:, offset:] = frame[:, :w - offset]
-
-        return canvas
-
-    return clip.set_make_frame(make_frame)
