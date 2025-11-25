@@ -1,6 +1,7 @@
 package com.bytedance.storymagician
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,14 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AssetsScreen() {
+fun AssetsScreen(onStoryClick: (Story) -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
-    // Box布局
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 主要内容区域（可滚动）
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,71 +56,28 @@ fun AssetsScreen() {
                     .padding(bottom = 16.dp)
             )
 
-            // 故事列表（可滚动）
             LazyColumn(
-                modifier = Modifier.weight(1f), // 占据剩余空间
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(getStories()) { story ->
-                    StoryCard(story)
+                    StoryCard(story) {
+                        onStoryClick(story) // 点击回调
+                    }
                 }
-            }
-        }
-
-        // 固定在底部的create和assets
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()//充满父容器
-                .align(Alignment.BottomCenter) // 固定在底部中央
-                .padding(10.dp) // 添加内边距
-        ) {
-            // Create按钮 - 白色背景，添加图标
-            Button(
-                onClick = { /* 创建逻辑 */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE8F5E8),
-                    contentColor = Color(0xFF2E7D32)
-                ),
-                shape = RectangleShape,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "创建",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Create")
-            }
-
-            // Assets按钮
-            Button(
-                onClick = { /* 等后端 */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE8F5E8),
-                    contentColor = Color(0xFF2E7D32)
-                ),
-                shape = RectangleShape,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Folder,
-                    contentDescription = "资源库",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Assets")
             }
         }
     }
 }
 
 @Composable
-fun StoryCard(story: Story) {
+fun StoryCard(story: Story, onClick: () -> Unit) {
     Card(
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() } // 整个Card可点击
     ) {
         Row(
             modifier = Modifier
@@ -131,16 +85,13 @@ fun StoryCard(story: Story) {
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 故事预览图
             Box(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE0E0E0)) // 添加背景色
+                    .background(Color(0xFFE0E0E0))
             )
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Column {
                 Text(
                     text = story.title,
@@ -156,6 +107,7 @@ fun StoryCard(story: Story) {
         }
     }
 }
+
 
 data class Story(
     val title: String,
