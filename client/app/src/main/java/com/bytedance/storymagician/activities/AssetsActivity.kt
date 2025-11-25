@@ -1,4 +1,4 @@
-package com.bytedance.storymagician
+package com.bytedance.storymagician.activities
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
