@@ -32,17 +32,15 @@ import androidx.compose.ui.graphics.RectangleShape
 
 
 @Composable
-fun PreviewScreen() {
+fun PreviewScreen(storyTitle: String, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
             .padding(10.dp)
     ) {
-        // 1. Back按钮
         TextButton(
-            onClick = { //等后端完善
-                 },
+            onClick = { onBack() },
             modifier = Modifier.align(Alignment.Start)
         ) {
             Icon(
@@ -51,86 +49,33 @@ fun PreviewScreen() {
                 modifier = Modifier.size(30.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text("Back",
-                fontSize = 30.sp)
+            Text("Back", fontSize = 30.sp)
         }
 
-        // 2. Preview标题
         Text(
-            text = "Preview",
+            text = "Preview: $storyTitle",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 8.dp),
             fontSize = 42.sp
         )
 
-        // 3. 视频播放区域
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(Color.Black)
         ) {
-            //视频播放区的后端接口
+            // TODO: 后端传来的视频缩略图/播放
         }
 
-        // 4. Export Video按钮
         Button(
-            onClick = { //export video按钮的后端接口
-                },
+            onClick = { /* TODO: Export Video */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
             Text("Export Video")
-        }
-
-        // 5. 空白区域
-        Spacer(modifier = Modifier.weight(1f))
-
-        // 6. 底部按钮 - 各占一半宽度
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Create按钮
-            Button(
-                onClick = { /* create的后端接口*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE8F5E8),
-                    contentColor = Color(0xFF2E7D32)
-                ),
-                shape = RectangleShape,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "创建",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Create")
-            }
-
-            // Assets按钮
-            Button(
-                onClick = { //asset按钮的后端接口
-                    },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE8F5E8),
-                    contentColor = Color(0xFF2E7D32)
-
-                ),
-                shape = RectangleShape,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Folder,
-                    contentDescription = "资源库",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Assets")
-            }
         }
     }
 }
