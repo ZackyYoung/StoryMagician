@@ -18,6 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,14 +33,17 @@ import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 
-
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
+    // 定义状态来跟踪选中的chip
+    var selectedStyle by remember { mutableStateOf("Movie") }
+
+    // 定义chip样式类型
+    val styles = listOf("Movie", "Animation", "Realistic")
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
             .padding(24.dp)
     ) {
         Text(
@@ -75,27 +82,30 @@ fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Chip(
-                onClick = { },
-                label = { Text("Movie", fontSize = 20.sp) },
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = Color.White
+            styles.forEach { style ->
+                Chip(
+                    onClick = {
+                        // 点击时更新选中状态
+                        selectedStyle = style
+                        // 这里可以添加其他逻辑，比如记录选中的值到ViewModel或其他地方
+                        println("Selected style: $style")
+                    },
+                    label = {
+                        Text(
+                            style,
+                            fontSize = 20.sp,
+                            // 根据选中状态更改文字颜色
+                            color = if (selectedStyle == style) Color.White else Color.Black
+                        )
+                    },
+                    colors = ChipDefaults.chipColors(
+                        // 根据选中状态更改背景颜色
+                        backgroundColor = if (selectedStyle == style) ButtonDefaults.buttonColors().containerColor else Color.White
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.padding(4.dp)
                 )
-            )
-            Chip(
-                onClick = { },
-                label = { Text("Animation", fontSize = 20.sp) },
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = Color.White
-                )
-            )
-            Chip(
-                onClick = { },
-                label = { Text("Realistic", fontSize = 20.sp) },
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = Color.White
-                )
-            )
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -105,9 +115,6 @@ fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue
-            ),
             shape = RoundedCornerShape(8.dp)
         ) {
             Text(
