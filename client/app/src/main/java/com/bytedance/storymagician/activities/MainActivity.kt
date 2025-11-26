@@ -23,22 +23,6 @@ import com.bytedance.storymagician.activities.ShotDetailActivity
 import com.bytedance.storymagician.activities.StoryboardActivity
 
 class MainActivity : ComponentActivity() {
-    // 保存状态的键
-    private val KEY_LAST_CREATE_ROUTE = "front_page"
-    private val KEY_LAST_ASSETS_ROUTE = "assets"
-    private val KEY_CURRENT_NAV_ITEM = "create"
-
-    private val KEY_LAST_SELECTED_STYLE = "movie"
-    private val KEY_LAST_SHOT_ID = ""
-    private val KEY_LAST_STORY_TITLE = ""
-
-    // 保存的状态
-    private var lastCreateGroupRoute by mutableStateOf("front_page")
-    private var lastAssetsGroupRoute by mutableStateOf("assets")
-    private var currentNavBarItem by mutableStateOf("create")
-    private var lastSelectedStyle by mutableStateOf("movie")
-    private var lastShotId by mutableStateOf<String?>(null)
-    private var lastStoryTitle by mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,46 +36,43 @@ class MainActivity : ComponentActivity() {
 fun StoryMagicianApp() {
     val navController = rememberNavController()
 
+    var showWarningDialog by remember { mutableStateOf(false) }
     // 当前底部导航栏选中项
     var currentNavBarItem by remember { mutableStateOf("create") }
 
-    // 第一组（front_page, storyboard, shot_detail）的最后访问页面
-    var lastCreateGroupRoute by remember { mutableStateOf("front_page") }
+    // 目标导航项
+    var targetNavItem by remember { mutableStateOf("") }
 
-    // 第二组（assets, preview）的最后访问页面
-    var lastAssetsGroupRoute by remember { mutableStateOf("assets") }
+    val executeNavigation = { item: String ->
+        if (currentNavBarItem != item) {
+            currentNavBarItem = item
+            // 切换到对应组的最后访问页面
+            when (item) {
+                "create" -> {
+                    navController.navigate("front_page") {
+                        launchSingleTop = true
+                    }
+                }
 
-    // 用于跟踪当前页面属于哪个组
-    var currentGroup by remember { mutableStateOf("create") }
-
+                "assets" -> {
+                    navController.navigate("assets") {
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+    }
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
                 navController = navController,
                 currentNavBarItem = currentNavBarItem,
-                lastCreateGroupRoute = lastCreateGroupRoute,
-                lastAssetsGroupRoute = lastAssetsGroupRoute,
                 onNavBarItemSelected = { item ->
-                    currentNavBarItem = item
-                    // 切换到对应组的最后访问页面
-                    when (item) {
-                        "create" -> {
-                            navController.navigate(lastCreateGroupRoute) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        }
-
-                        "assets" -> {
-                            navController.navigate(lastAssetsGroupRoute) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        }
+                    if (item == "assets" && currentNavBarItem == "create") {
+                        showWarningDialog = true
+                        targetNavItem = item
+                    } else {
+                        executeNavigation(item)
                     }
                 }
             )
@@ -101,18 +82,34 @@ fun StoryMagicianApp() {
         Box(modifier = Modifier.padding(paddingValues)) {
             AppNavHost(
                 navController = navController,
-                onRouteChanged = { route ->
-                    // 更新相应组的最后访问页面
-                    when (route) {
-                        "front_page", "storyboard", "shot_detail" -> {
-                            lastCreateGroupRoute = route
-                            currentGroup = "create"
-                        }
+                onRouteChanged = {}
+            )
+        }
 
-                        "assets", "preview" -> {
-                            lastAssetsGroupRoute = route
-                            currentGroup = "assets"
+        if (showWarningDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    showWarningDialog = false
+                },
+                title = { Text("Warning") },
+                text = { Text("If you switch to the asset library, your inputs in the current story will be discarded.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showWarningDialog = false
+                            executeNavigation(targetNavItem)
                         }
+                    ) {
+                        Text("Continue")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showWarningDialog = false
+                        }
+                    ) {
+                        Text("Cancel")
                     }
                 }
             )
@@ -127,8 +124,6 @@ fun StoryMagicianApp() {
 fun BottomNavigationBar(
     navController: NavHostController,
     currentNavBarItem: String,
-    lastCreateGroupRoute: String,
-    lastAssetsGroupRoute: String,
     onNavBarItemSelected: (String) -> Unit
 ) {
     NavigationBar {
@@ -174,33 +169,39 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         // 故事板页面
         composable("storyboard") {
             onRouteChanged("storyboard")
-            StoryboardActivity(navController = navController) { shotId ->
-                navController.navigate("shot_detail/$shotId")
-            }
+            StoryboardActivity(
+                navController = navController,
+                onShotClick = { shotId -> navController.navigate("shot_detail/$shotId") },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // Shot详情页
         composable("shot_detail/{id}") { backStackEntry ->
             onRouteChanged("shot_detail")
             val id = backStackEntry.arguments?.getString("id")
-            ShotDetailActivity(navController = navController, shotId = id)
+            ShotDetailActivity(shotId = id, onBack = {
+                navController.popBackStack()
+            })
         }
 
         // Assets 页面
         composable("assets") {
             onRouteChanged("assets")
-            AssetsActivity { story ->
+            AssetsActivity { storyId ->
                 // 点击某个Story记录进入PreviewScreen
-                navController.navigate("preview/${story.title}")
+                navController.navigate("preview/${storyId}")
             }
         }
 
         // Preview 页面
-        composable("preview/{title}") { backStackEntry ->
+        composable("preview/{id}") { backStackEntry ->
             onRouteChanged("preview")
-            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val title = backStackEntry.arguments?.getString("id") ?: ""
             PreviewActivity(
-                storyTitle = title,
+                storyId = id,
                 onBack = { navController.popBackStack() } // 返回AssetsScreen
             )
         }

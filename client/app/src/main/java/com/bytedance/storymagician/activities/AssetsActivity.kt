@@ -17,9 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bytedance.storymagician.Story
 
 @Composable
-fun AssetsActivity(onStoryClick: (Story) -> Unit) {
+fun AssetsActivity(onStoryClick: (Int) -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -59,7 +60,7 @@ fun AssetsActivity(onStoryClick: (Story) -> Unit) {
             ) {
                 items(getStories()) { story ->
                     StoryCard(story) {
-                        onStoryClick(story) // 点击回调
+                        onStoryClick(story.id) // 点击回调
                     }
                 }
             }
@@ -106,23 +107,19 @@ fun StoryCard(story: Story, onClick: () -> Unit) {
 }
 
 
-data class Story(
-    val title: String,
-    val date: String
-)
 
 fun getStories(): List<Story> {
     return listOf(
-        Story("Camping Adventure", "Apr 21, 2024"),
-        Story("Sunset at the Summit", "Apr 21, 2024"),
-        Story("Journey Through Woods", "Apr 20, 2024"),
-        Story("Mountain Hiking", "Apr 19, 2024"),
-        Story("Forest Exploration", "Apr 18, 2024"),
-        Story("Beach Vacation", "Apr 17, 2024"),
-        Story("City Tour", "Apr 16, 2024"),
-        Story("Night Photography", "Apr 15, 2024"),
-        Story("Winter Sports", "Apr 14, 2024"),
-        Story("Spring Festival", "Apr 13, 2024")
+        Story(1, "Camping Adventure", "Apr 21, 2024"),
+        Story(2, "Sunset at the Summit", "Apr 21, 2024"),
+        Story(3, "Journey Through Woods", "Apr 20, 2024"),
+        Story(4, "Mountain Hiking", "Apr 19, 2024"),
+        Story(5, "Forest Exploration", "Apr 18, 2024"),
+        Story(6, "Beach Vacation", "Apr 17, 2024"),
+        Story(7, "City Tour", "Apr 16, 2024"),
+        Story(8, "Night Photography", "Apr 15, 2024"),
+        Story(9, "Winter Sports", "Apr 14, 2024"),
+        Story(10, "Spring Festival", "Apr 13, 2024")
         //这些是样例，到时候应该是数据库导入进来的
     )
 }

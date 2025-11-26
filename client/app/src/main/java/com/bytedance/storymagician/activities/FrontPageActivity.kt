@@ -36,6 +36,8 @@ import androidx.wear.compose.material.ExperimentalWearMaterialApi
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
+    var description by remember { mutableStateOf("") }
+
     // 定义状态来跟踪选中的chip
     var selectedStyle by remember { mutableStateOf("Movie") }
 
@@ -63,8 +65,8 @@ fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
         )
 
         TextField(
-            value = "",
-            onValueChange = { },
+            value = description,
+            onValueChange = { description = it },
             placeholder = { Text("Write your story...") },
             modifier = Modifier
                 .fillMaxWidth()

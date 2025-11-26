@@ -18,8 +18,8 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun ShotDetailActivity(
-    navController: NavController,
-    shotId: String?
+    shotId: String?,
+    onBack: () -> Unit
 ) {
 
     var description by remember { mutableStateOf("A misty forest at dawn with a tent") }
@@ -33,7 +33,7 @@ fun ShotDetailActivity(
             .padding(16.dp)
     ) {
 
-        TextButton(onClick = { navController.popBackStack() }) {
+        TextButton(onClick = { onBack() }) {
             Icon(Icons.Default.ArrowBack, contentDescription = null)
             Spacer(Modifier.width(6.dp))
             Text("Back", fontSize = 20.sp)
@@ -127,5 +127,5 @@ fun ShotDetailActivity(
 @Preview
 @Composable
 fun ShotDetailActivityPreview() {
-    ShotDetailActivity(navController = rememberNavController(), shotId = "123")
+    ShotDetailActivity(onBack = {}, shotId = "123")
 }

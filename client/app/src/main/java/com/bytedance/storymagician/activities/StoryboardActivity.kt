@@ -21,19 +21,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bytedance.storymagician.R
+import com.bytedance.storymagician.Shot
 
-data class Shot(
-    val id: Int,
-    val title: String,
-    val status: String = "Not Generated",
-    val imageRes: Int = R.drawable.placeholder // 将来这里可能改成后端传来的缩略图URL或本地缓存路径
-
-)
 
 @Composable
 fun StoryboardActivity(
     navController: NavController,
-    onShotClick: (Int) -> Unit = {}
+    onShotClick: (Int) -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
 
     // TODO: 这里将来可以从后端接口获取列表数据，例如：

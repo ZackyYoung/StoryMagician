@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun PreviewActivity(storyTitle: String, onBack: () -> Unit) {
+fun PreviewActivity(storyId: Int, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +48,7 @@ fun PreviewActivity(storyTitle: String, onBack: () -> Unit) {
         }
 
         Text(
-            text = "Preview: $storyTitle",
+            text = "Preview: $storyId",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 8.dp),
