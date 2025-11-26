@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun ShotDetailActivity(
-    shotId: String?,
+    shotId: Int?,
     onBack: () -> Unit
 ) {
 
@@ -34,7 +34,7 @@ fun ShotDetailActivity(
     ) {
 
         TextButton(onClick = { onBack() }) {
-            Icon(Icons.Default.ArrowBack, contentDescription = null)
+            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
             Spacer(Modifier.width(6.dp))
             Text("Back", fontSize = 20.sp)
         }
@@ -75,7 +75,7 @@ fun ShotDetailActivity(
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { expanded = true }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
                     }
                 }
             )
@@ -127,5 +127,5 @@ fun ShotDetailActivity(
 @Preview
 @Composable
 fun ShotDetailActivityPreview() {
-    ShotDetailActivity(onBack = {}, shotId = "123")
+    ShotDetailActivity(onBack = {}, shotId = 123)
 }

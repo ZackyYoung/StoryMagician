@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun PreviewActivity(storyId: Int, onBack: () -> Unit) {
+fun PreviewActivity(storyId: Int?, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +39,7 @@ fun PreviewActivity(storyId: Int, onBack: () -> Unit) {
             modifier = Modifier.align(Alignment.Start)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 contentDescription = "返回",
                 modifier = Modifier.size(30.dp)
             )

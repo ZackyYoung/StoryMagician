@@ -170,7 +170,6 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         composable("storyboard") {
             onRouteChanged("storyboard")
             StoryboardActivity(
-                navController = navController,
                 onShotClick = { shotId -> navController.navigate("shot_detail/$shotId") },
                 onBack = {
                     navController.popBackStack()
@@ -181,7 +180,7 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         // Shot详情页
         composable("shot_detail/{id}") { backStackEntry ->
             onRouteChanged("shot_detail")
-            val id = backStackEntry.arguments?.getString("id")
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
             ShotDetailActivity(shotId = id, onBack = {
                 navController.popBackStack()
             })
@@ -192,14 +191,14 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
             onRouteChanged("assets")
             AssetsActivity { storyId ->
                 // 点击某个Story记录进入PreviewScreen
-                navController.navigate("preview/${storyId}")
+                navController.navigate("preview/$storyId")
             }
         }
 
         // Preview 页面
         composable("preview/{id}") { backStackEntry ->
             onRouteChanged("preview")
-            val title = backStackEntry.arguments?.getString("id") ?: ""
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
             PreviewActivity(
                 storyId = id,
                 onBack = { navController.popBackStack() } // 返回AssetsScreen
