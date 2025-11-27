@@ -15,8 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    # API 信息
+    openapi.Info(
+        title='接口文档',   # API文档标题
+        default_version='V1',   # 版本信息
+        description='接口文档',    # 描述内容
+    ),
+    public=True,    # 是否公开
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("stories/", include("stories.urls")),
+    path("scenes/", include("scenes.urls")),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),   # 互动模式
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),   # 文档模式
 ]

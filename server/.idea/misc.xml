@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="server" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="StoryMagician" project-jdk-type="Python SDK" />
 </project>
