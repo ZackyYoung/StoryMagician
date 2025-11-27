@@ -1,5 +1,6 @@
 package com.bytedance.storymagician
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,6 +16,10 @@ import com.bytedance.storymagician.components.StoryboardScreen
  */
 @Composable
 fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Unit) {
+
+    val pageStates: Bundle = Bundle()
+
+
     NavHost(navController = navController, startDestination = "front_page") {
         // 首页
         composable("front_page") {
@@ -30,7 +35,8 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         composable("storyboard") {
             onRouteChanged("storyboard")
             StoryboardScreen(
-                onShotClick = { shotId -> navController.navigate("shot_detail/$shotId") },
+                onShotClick = { shotId -> pageStates.putInt("shot_id", shotId)
+                    navController.navigate("shot_detail") },
                 onBack = {
                     navController.popBackStack()
                 }
@@ -38,10 +44,10 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         }
 
         // Shot详情页
-        composable("shot_detail/{id}") { backStackEntry ->
+        composable("shot_detail") {
             onRouteChanged("shot_detail")
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-            ShotDetailScreen(shotId = id, onBack = {
+            val shotId = pageStates.getInt("shot_id")
+            ShotDetailScreen(shotId = shotId, onBack = {
                 navController.popBackStack()
             })
         }
@@ -50,17 +56,17 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         composable("assets") {
             onRouteChanged("assets")
             AssetsScreen { storyId ->
-                // 点击某个Story记录进入PreviewScreen
-                navController.navigate("preview/$storyId")
+                pageStates.putInt("story_id", storyId)
+                navController.navigate("preview")
             }
         }
 
         // Preview 页面
-        composable("preview/{id}") { backStackEntry ->
+        composable("preview") {
             onRouteChanged("preview")
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+            val storyId = pageStates.getInt("story_id")
             PreviewScreen(
-                storyId = id,
+                storyId = storyId,
                 onBack = { navController.popBackStack() } // 返回AssetsScreen
             )
         }

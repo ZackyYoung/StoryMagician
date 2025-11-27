@@ -66,7 +66,6 @@ fun StoryMagicianApp() {
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
-                navController = navController,
                 currentNavBarItem = currentNavBarItem,
                 onNavBarItemSelected = { item ->
                     if (item == "assets" && currentNavBarItem == "create") {

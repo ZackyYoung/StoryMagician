@@ -15,7 +15,6 @@ import androidx.navigation.NavHostController
  */
 @Composable
 fun BottomNavigationBar(
-    navController: NavHostController,
     currentNavBarItem: String,
     onNavBarItemSelected: (String) -> Unit
 ) {
