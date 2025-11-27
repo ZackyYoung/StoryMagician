@@ -1,4 +1,4 @@
-package com.bytedance.storymagician.activities
+package com.bytedance.storymagician.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun PreviewActivity(storyId: Int?, onBack: () -> Unit) {
+fun PreviewScreen(storyId: Int?, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

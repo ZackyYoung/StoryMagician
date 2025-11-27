@@ -1,4 +1,4 @@
-package com.bytedance.storymagician.activities
+package com.bytedance.storymagician.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.bytedance.storymagician.Story
 
 @Composable
-fun AssetsActivity(onStoryClick: (Int) -> Unit) {
+fun AssetsScreen(onStoryClick: (Int) -> Unit) {
     var searchText by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -1,4 +1,4 @@
-package com.bytedance.storymagician.activities
+package com.bytedance.storymagician
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,11 +16,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.bytedance.storymagician.activities.AssetsActivity
-import com.bytedance.storymagician.activities.FrontPageActivity
-import com.bytedance.storymagician.activities.PreviewActivity
-import com.bytedance.storymagician.activities.ShotDetailActivity
-import com.bytedance.storymagician.activities.StoryboardActivity
+import com.bytedance.storymagician.components.AssetsScreen
+import com.bytedance.storymagician.components.BottomNavigationBar
+import com.bytedance.storymagician.components.FrontPageScreen
+import com.bytedance.storymagician.components.PreviewScreen
+import com.bytedance.storymagician.components.ShotDetailScreen
+import com.bytedance.storymagician.components.StoryboardScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -117,100 +118,9 @@ fun StoryMagicianApp() {
     }
 }
 
-/**
- * 全局底部导航栏
- */
-@Composable
-fun BottomNavigationBar(
-    navController: NavHostController,
-    currentNavBarItem: String,
-    onNavBarItemSelected: (String) -> Unit
-) {
-    NavigationBar {
-        // Create 按钮
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Add, contentDescription = "Create") },
-            label = { Text("Create") },
-            selected = currentNavBarItem == "create",
-            onClick = {
-                onNavBarItemSelected("create")
-            }
-        )
-
-        // Assets按钮
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Folder, contentDescription = "Assets") },
-            label = { Text("Assets") },
-            selected = currentNavBarItem == "assets",
-            onClick = {
-                onNavBarItemSelected("assets")
-            }
-        )
-    }
-}
-
-
-/**
- * 全局 NavHost，管理所有页面的路由
- */
-@Composable
-fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Unit) {
-    NavHost(navController = navController, startDestination = "front_page") {
-        // 首页
-        composable("front_page") {
-            onRouteChanged("front_page")
-            FrontPageActivity(onGenerateStoryboard = {
-                // 点击Generate Storyboard按钮导航到storyboard页面
-                navController.navigate("storyboard") {
-                    launchSingleTop = true
-                }
-            })
-        }
-        // 故事板页面
-        composable("storyboard") {
-            onRouteChanged("storyboard")
-            StoryboardActivity(
-                onShotClick = { shotId -> navController.navigate("shot_detail/$shotId") },
-                onBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        // Shot详情页
-        composable("shot_detail/{id}") { backStackEntry ->
-            onRouteChanged("shot_detail")
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-            ShotDetailActivity(shotId = id, onBack = {
-                navController.popBackStack()
-            })
-        }
-
-        // Assets 页面
-        composable("assets") {
-            onRouteChanged("assets")
-            AssetsActivity { storyId ->
-                // 点击某个Story记录进入PreviewScreen
-                navController.navigate("preview/$storyId")
-            }
-        }
-
-        // Preview 页面
-        composable("preview/{id}") { backStackEntry ->
-            onRouteChanged("preview")
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-            PreviewActivity(
-                storyId = id,
-                onBack = { navController.popBackStack() } // 返回AssetsScreen
-            )
-        }
 
 
 
-
-
-    }
-}
 
 @Preview
 @Composable

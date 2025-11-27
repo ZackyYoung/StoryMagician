@@ -1,4 +1,4 @@
-package com.bytedance.storymagician.activities
+package com.bytedance.storymagician.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,11 +13,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun ShotDetailActivity(
+fun ShotDetailScreen(
     shotId: Int?,
     onBack: () -> Unit
 ) {
@@ -126,6 +124,6 @@ fun ShotDetailActivity(
 
 @Preview
 @Composable
-fun ShotDetailActivityPreview() {
-    ShotDetailActivity(onBack = {}, shotId = 123)
+fun ShotDetailScreenPreview() {
+    ShotDetailScreen(onBack = {}, shotId = 123)
 }

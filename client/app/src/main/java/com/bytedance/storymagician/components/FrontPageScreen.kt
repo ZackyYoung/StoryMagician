@@ -1,11 +1,9 @@
-package com.bytedance.storymagician.activities
+package com.bytedance.storymagician.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,7 +33,7 @@ import androidx.wear.compose.material.ExperimentalWearMaterialApi
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
-fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
+fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
     var description by remember { mutableStateOf("") }
 
     // 定义状态来跟踪选中的chip
@@ -140,6 +138,6 @@ fun FrontPageActivity(onGenerateStoryboard: () -> Unit) {
 
 @Preview
 @Composable
-fun FrontPageActivityPreview() {
-    FrontPageActivity(onGenerateStoryboard = {})
+fun FrontPageScreenPreview() {
+    FrontPageScreen(onGenerateStoryboard = {})
 }
