@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+requests
+pydantic
+diffusers>=0.20.0
+transformers
+torch
+accelerate
+safetensors
+imageio
+pillow
+python-multipart
+hf_xet
+ollama
+moviepy
