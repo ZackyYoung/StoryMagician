@@ -22,6 +22,7 @@ import com.bytedance.storymagician.components.FrontPageScreen
 import com.bytedance.storymagician.components.PreviewScreen
 import com.bytedance.storymagician.components.ShotDetailScreen
 import com.bytedance.storymagician.components.StoryboardScreen
+import com.bytedance.storymagician.AppNavHost
 
 class MainActivity : ComponentActivity() {
 
@@ -115,15 +116,4 @@ fun StoryMagicianApp() {
             )
         }
     }
-}
-
-
-
-
-
-@Preview
-@Composable
-fun AppNavHostPreview() {
-    val navController = rememberNavController()
-    AppNavHost(navController = navController, onRouteChanged = {})
 }

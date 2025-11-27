@@ -22,6 +22,7 @@ import com.bytedance.storymagician.Shot
 
 @Composable
 fun StoryboardScreen(
+    storyId: Int,
     onShotClick: (Int) -> Unit = {},
     onBack: () -> Unit = {}
 ) {
@@ -126,5 +127,5 @@ fun StoryboardScreen(
 @Preview
 @Composable
 fun StoryBoardPreview() {
-    StoryboardScreen()
+    StoryboardScreen(storyId = 1)
 }

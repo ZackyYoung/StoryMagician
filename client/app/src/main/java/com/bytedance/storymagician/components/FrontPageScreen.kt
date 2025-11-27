@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -27,11 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipDefaults
-import androidx.wear.compose.material.ExperimentalWearMaterialApi
 
-@OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
     var description by remember { mutableStateOf("") }
@@ -73,7 +71,9 @@ fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                unfocusedContainerColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
             )
         )
 
@@ -83,25 +83,15 @@ fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             styles.forEach { style ->
-                Chip(
-                    onClick = {
-                        // 点击时更新选中状态
-                        selectedStyle = style
-                        // 这里可以添加其他逻辑，比如记录选中的值到ViewModel或其他地方
-                        println("Selected style: $style")
-                    },
+                FilterChip(
+                    selected = selectedStyle == style,
+                    onClick = { selectedStyle = style },
                     label = {
                         Text(
                             style,
                             fontSize = 20.sp,
-                            // 根据选中状态更改文字颜色
-                            color = if (selectedStyle == style) Color.White else Color.Black
                         )
                     },
-                    colors = ChipDefaults.chipColors(
-                        // 根据选中状态更改背景颜色
-                        backgroundColor = if (selectedStyle == style) ButtonDefaults.buttonColors().containerColor else Color.White
-                    ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.padding(4.dp)
                 )

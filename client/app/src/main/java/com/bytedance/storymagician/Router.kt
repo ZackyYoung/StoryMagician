@@ -17,7 +17,7 @@ import com.bytedance.storymagician.components.StoryboardScreen
 @Composable
 fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Unit) {
 
-    val pageStates: Bundle = Bundle()
+    val pageStates = Bundle()
 
 
     NavHost(navController = navController, startDestination = "front_page") {
@@ -26,6 +26,7 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
             onRouteChanged("front_page")
             FrontPageScreen(onGenerateStoryboard = {
                 // 点击Generate Storyboard按钮导航到storyboard页面
+                // TODO:调用接口返回storyId后存储到pageStates
                 navController.navigate("storyboard") {
                     launchSingleTop = true
                 }
@@ -35,6 +36,7 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         composable("storyboard") {
             onRouteChanged("storyboard")
             StoryboardScreen(
+                storyId = pageStates.getInt("story_id"),
                 onShotClick = { shotId -> pageStates.putInt("shot_id", shotId)
                     navController.navigate("shot_detail") },
                 onBack = {
@@ -46,8 +48,9 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         // Shot详情页
         composable("shot_detail") {
             onRouteChanged("shot_detail")
-            val shotId = pageStates.getInt("shot_id")
-            ShotDetailScreen(shotId = shotId, onBack = {
+            ShotDetailScreen(
+                shotId = pageStates.getInt("shot_id"),
+                onBack = {
                 navController.popBackStack()
             })
         }
@@ -64,16 +67,10 @@ fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Uni
         // Preview 页面
         composable("preview") {
             onRouteChanged("preview")
-            val storyId = pageStates.getInt("story_id")
             PreviewScreen(
-                storyId = storyId,
+                storyId = pageStates.getInt("story_id"),
                 onBack = { navController.popBackStack() } // 返回AssetsScreen
             )
         }
-
-
-
-
-
     }
 }
