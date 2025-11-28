@@ -7,6 +7,7 @@ class StoryboardShot(BaseModel):
     narration: str
 
 class StoryboardRequest(BaseModel):
+    story_title: str
     story_text: str
     style: str
 

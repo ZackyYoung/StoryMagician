@@ -24,7 +24,7 @@ def storyboard_api(req: StoryboardRequest):
     根据故事文本 + 风格，生成分镜 JSON。
     """
     try:
-        shots = generate_storyboard(req.story_text, req.style)
+        shots = generate_storyboard(req.story_title, req.story_text, req.style)
         return {"shots": shots}
     except Exception as e:
         logger.exception("LLM storyboard generation failed")
