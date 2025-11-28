@@ -5,7 +5,6 @@ class StoryboardShot(BaseModel):
     scene: str
     prompt: str
     narration: str
-    bgm: Optional[str] = None
 
 class StoryboardRequest(BaseModel):
     story_text: str

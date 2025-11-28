@@ -45,6 +45,9 @@ fun StoryMagicianApp() {
     // 目标导航项
     var targetNavItem by remember { mutableStateOf("") }
 
+    // 网络服务接口代理对象
+    val appService = ServiceCreator.create<AppService>()
+
     val executeNavigation = { item: String ->
         if (currentNavBarItem != item) {
             currentNavBarItem = item
