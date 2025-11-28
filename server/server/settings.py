@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-21968)3*7ys!*8az-qh@%*6$)!9!d7rp-(rou^pexz71)ob)m_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["14.103.19.244", "0.0.0.0"]
 
 
 # Application definition
@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'stories.apps.StoriesConfig',
     'scenes.apps.ScenesConfig',
     'videos.apps.VideosConfig',
-    'tasks.apps.TasksConfig',
     'rest_framework',
     'drf_yasg'
 ]
@@ -150,7 +149,7 @@ USE_I18N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -170,3 +169,12 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_TIMEZONE = "Asia/Shanghai"
 CELERY_ENABLE_UTC = False
+
+
+# my
+BASE_REQUEST_URL = "http://14.103.19.244:18000"
+BASE_SOURCE_URL = "http://14.103.19.244"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+IMAGE_DIR = "image"
+AUDIO_DIR = "audio"
+VIDEO_DIR = "video"

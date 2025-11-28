@@ -7,7 +7,7 @@ from rest_framework import status
 
 from .models import Scene
 from .serializers import GenerateSceneSerializer, SceneDetailSerializer
-from tasks.services import generate_scene_img
+from .services import generate_scene
 
 class GenerateSceneView(APIView):
     """
@@ -21,8 +21,9 @@ class GenerateSceneView(APIView):
                 "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="scene id"),
                 "title": openapi.Schema(type=openapi.TYPE_STRING, description="scene标题"),
                 "prompt": openapi.Schema(type=openapi.TYPE_STRING, description="scene提示词"),
+                "narration": openapi.Schema(type=openapi.TYPE_STRING, description="旁白"),
             },
-            required=["id", "title", "prompt"],
+            required=["id"],
         ),
         responses={
             201: openapi.Response("提交成功!"),
@@ -33,16 +34,16 @@ class GenerateSceneView(APIView):
     def post(self, request):
         serializer = GenerateSceneSerializer(data=request.data)
         if serializer.is_valid():
+            scene_id = serializer.validated_data["id"]
+            scene = Scene.objects.filter(id=scene_id)
+            if not scene.exists():
+                return Response(
+                    {"error": "未找到对应的 Scene"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             try:
-                scene_id = serializer.validated_data["id"]
-                scene = Scene.objects.filter(id=scene_id)
-                if not scene.exists():
-                    return Response(
-                        {"error": "未找到对应的 Scene"},
-                        status=status.HTTP_404_NOT_FOUND
-                    )
                 update_fields = []
-                for field in ["title", "prompt"]:
+                for field in ["title", "prompt", "narration"]:
                     if field in serializer.validated_data:
                         setattr(scene, field, serializer.validated_data[field])
                         update_fields.append(field)
@@ -50,18 +51,20 @@ class GenerateSceneView(APIView):
                 if update_fields:
                     scene.save(update_fields=update_fields)
 
-                task = generate_scene_img.delay([scene_id])
+                task = generate_scene.delay([scene_id])
 
                 return Response({"message": "提交成功！", "task_id": task.id},
                                 status=status.HTTP_201_CREATED)
             except Exception as e:
+                scene.info = str(e)
+                scene.save()
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SceneDetailView(RetrieveAPIView):
     """
-    查询故事详情，返回 story属性、scene列表、videos列表
+    查询分镜详情，返回 title, style, prompt, narration, image_url, audio_url等
     """
     serializer_class = SceneDetailSerializer
     lookup_field = "id"

@@ -11,10 +11,13 @@ from django.utils import timezone
 
 from .models import Story
 from .serializers import StorySerializer, CreateStorySerializer, StoryDetailSerializer
-from tasks.services import generate_scene_img, generate_scene_prompt
+from .services import generate_scene_prompt, delete_story
+from scenes.services import generate_scene
 from .enums import StoryStatus
 from .filters import StoryFilter
 from scenes.models import Scene
+from videos.models import Video
+
 
 # 创建故事
 class CreateStoryView(APIView):
@@ -30,8 +33,9 @@ class CreateStoryView(APIView):
             properties={
                 "title": openapi.Schema(type=openapi.TYPE_STRING, description="标题"),
                 "description": openapi.Schema(type=openapi.TYPE_STRING, description="描述"),
+                "style": openapi.Schema(type=openapi.TYPE_STRING, description="风格"),
             },
-            required=["title", "description"],
+            required=["title", "description", "style"],
         ),
         responses={
             201: openapi.Response("提交成功!"),
@@ -43,26 +47,29 @@ class CreateStoryView(APIView):
     def post(self, request):
         serializer = CreateStorySerializer(data=request.data)
         if serializer.is_valid():
+            title = serializer.validated_data["title"]
+            description = serializer.validated_data["description"]
+            style = serializer.validated_data["style"]
+            # 1. 创建 Story 实体
+            story = Story.objects.create(
+                title=title,
+                description=description,
+                style=style,
+                status=StoryStatus.DRAFT.value,
+                created_at=timezone.now(),
+                updated_at=timezone.now(),
+            )
+            story.save()
             try:
-                title = serializer.validated_data["title"]
-                description = serializer.validated_data["description"]
-                # 1. 创建 Story 实体
-                story = Story.objects.create(
-                    title=title,
-                    description=description,
-                    status=StoryStatus.DRAFT.value,
-                    created_at=timezone.now(),
-                    updated_at=timezone.now(),
-                )
-                story.save()
                 workflow = chain(
                     generate_scene_prompt.s(story.id),
-                    generate_scene_img.s()
+                    generate_scene.s()
                 )
                 task = workflow.apply_async()
-
                 return Response({"message": "提交成功！", "task_id": task.id, "story_id": story.id}, status=status.HTTP_201_CREATED)
             except Exception as e:
+                story.info = str(e)
+                story.save()
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -101,14 +108,17 @@ class StoryListView(ListAPIView):
                 format=openapi.FORMAT_DATETIME
             ),
         ],
-        responses = {200: StorySerializer(many=True)},
+        responses = {
+            200: StorySerializer(many=True),
+            400: openapi.Response("无效请求！"),
+            500: openapi.Response("系统错误！")
+        },
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         return Story.objects.filter().order_by("-created_at")
-
 
 
 class StoryDetailView(RetrieveAPIView):
@@ -130,7 +140,11 @@ class StoryDetailView(RetrieveAPIView):
                 required=True
             )
         ],
-        responses={200: StoryDetailSerializer}
+        responses={
+            200: StoryDetailSerializer,
+            400: openapi.Response("无效请求！"),
+            500: openapi.Response("系统错误！")
+        }
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -146,3 +160,44 @@ class StoryDetailView(RetrieveAPIView):
                 )
             )
         )
+
+
+class DeleteStroyView(APIView):
+    """
+    删除story，以及相关scene、video
+    """
+    
+    @swagger_auto_schema(
+        operation_summary="删除故事",
+        operation_description="根据故事ID删除故事",
+        manual_parameters=[
+            openapi.Parameter(
+                name="id",
+                in_=openapi.IN_QUERY,
+                description="故事ID",
+                type=openapi.TYPE_INTEGER,
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response("删除成功！"),
+            400: openapi.Response("无效请求！"),
+            500: openapi.Response("系统错误！")
+        }
+    )
+    
+    def delete(self, request):
+        story_id = request.query_params.get("id")
+        if story_id is not None:
+            story = Story.objects.get(id=story_id)
+            if story is None:
+                return Response(
+                    {"error": "未找到对应的 story"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+                
+           
+            delete_story(story_id)
+            return Response({"message": "删除成功"}, status=status.HTTP_200_OK)
+        
+        return Response({"error": "无效请求！"}, status=status.HTTP_400_BAD_REQUEST)

@@ -7,7 +7,7 @@ from videos.models import Video
 class CreateStorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
-        fields = ["title", "description"]
+        fields = ["title", "description", "style"]
 
 class StorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +18,7 @@ class StorySerializer(serializers.ModelSerializer):
 class SceneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scene
-        fields = ["id", "scene_index", "prompt", "title", "narration", "image_url", "status", "created_at", "updated_at"]
+        fields = ["id", "scene_index", "prompt", "title", "narration", "image_url", "audio_url", "status", "created_at", "updated_at"]
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -37,10 +37,11 @@ class StoryDetailSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
+            "style",
+            "status",
             "created_at",
             "updated_at",
+            "info",
             "scenes",
             "videos",
         ]
-
-

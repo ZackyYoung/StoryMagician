@@ -10,11 +10,12 @@ from stories.models import Story
 
 class Video(models.Model):
     story = models.ForeignKey(Story, models.DO_NOTHING, related_name="videos", blank=True, null=True)
-    video_url = models.CharField(max_length=1024, blank=True, null=True)
+    video_url = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
-
+    info = models.TextField(blank=True, null=True)
+    
     class Meta:
-        managed = False
+        managed = True
         db_table = 'video'

@@ -13,12 +13,15 @@ class Scene(models.Model):
     scene_index = models.IntegerField(blank=True, null=True)
     prompt = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
+    style = models.CharField(max_length=255, blank=True, null=True)
     narration = models.TextField(blank=True, null=True)
-    image_url = models.CharField(max_length=1023, blank=True, null=True)
+    image_url = models.CharField(max_length=255, blank=True, null=True)
+    audio_url = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
-
+    info = models.TextField(blank=True, null=True)
+    
     class Meta:
-        managed = False
+        managed = True
         db_table = 'scene'

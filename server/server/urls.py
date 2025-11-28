@@ -34,6 +34,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("stories/", include("stories.urls")),
     path("scenes/", include("scenes.urls")),
+    path("videos/", include("videos.urls")),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),   # 互动模式
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),   # 文档模式
 ]
