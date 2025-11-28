@@ -11,7 +11,7 @@ import retrofit2.http.Path
 interface AppService {
     // 生成一个新的story
     @POST("/story")
-    suspend fun postStory(@Body createStoryRequest: CreateStoryRequest): Story
+    suspend fun postStory(@Body createStoryRequest: CreateStoryRequest): Response<ResponseBody>
 
     // 获取所有的story
     @GET("/story")
