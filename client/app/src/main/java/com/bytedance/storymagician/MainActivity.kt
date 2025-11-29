@@ -1,6 +1,7 @@
 package com.bytedance.storymagician
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,6 +22,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 初始化 ServiceCreator
+        ServiceCreator.init(this)
         setContent {
             StoryMagicianApp()
         }
@@ -30,12 +33,10 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StoryMagicianApp() {
-    // 1. 实例化共享的 ViewModel
     val sharedViewModel: SharedViewModel = viewModel()
-
     val pagerState = rememberPagerState { 2 }
     val coroutineScope = rememberCoroutineScope()
-
+    val appService = ServiceCreator.create(AppService::class.java)
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
