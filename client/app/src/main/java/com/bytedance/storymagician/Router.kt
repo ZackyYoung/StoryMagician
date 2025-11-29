@@ -1,75 +1,77 @@
 package com.bytedance.storymagician
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.bytedance.storymagician.components.AssetsScreen
 import com.bytedance.storymagician.components.FrontPageScreen
 import com.bytedance.storymagician.components.PreviewScreen
 import com.bytedance.storymagician.components.ShotDetailScreen
 import com.bytedance.storymagician.components.StoryboardScreen
+import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 /**
- * 全局 NavHost，管理所有页面的路由
+ * "Create" 标签页的独立导航容器
+ * @param viewModel 共享的 ViewModel，用于跨屏幕传递数据
  */
 @Composable
-fun AppNavHost(navController: NavHostController, onRouteChanged: (String) -> Unit) {
-
-    val pageStates = Bundle()
-
-
+fun CreateNavHost(viewModel: SharedViewModel) {
+    val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "front_page") {
-        // 首页
         composable("front_page") {
-            onRouteChanged("front_page")
             FrontPageScreen(onGenerateStoryboard = {
-                // 点击Generate Storyboard按钮导航到storyboard页面
-                // TODO:调用接口返回storyId后存储到pageStates
-                navController.navigate("storyboard") {
-                    launchSingleTop = true
-                }
+                // 在实际应用中，这里可能会调用 API 生成一个故事，然后获取其 ID
+                val generatedStoryId = 1 // 假设生成的故事ID是1
+                viewModel.selectStory(generatedStoryId)
+                navController.navigate("storyboard")
             })
         }
-        // 故事板页面
         composable("storyboard") {
-            onRouteChanged("storyboard")
+            val storyId by viewModel.storyId.collectAsStateWithLifecycle()
             StoryboardScreen(
-                storyId = pageStates.getInt("story_id"),
-                onShotClick = { shotId -> pageStates.putInt("shot_id", shotId)
-                    navController.navigate("shot_detail") },
-                onBack = {
-                    navController.popBackStack()
-                }
+                // 如果 storyId 为 null，显示0。在真实应用中，您可能想显示一个加载或错误状态。
+                storyId = storyId ?: 0,
+                onShotClick = { shotId ->
+                    viewModel.selectShot(shotId)
+                    navController.navigate("shot_detail")
+                },
+                onBack = { navController.popBackStack() }
             )
         }
-
-        // Shot详情页
         composable("shot_detail") {
-            onRouteChanged("shot_detail")
+            val shotId by viewModel.shotId.collectAsStateWithLifecycle()
             ShotDetailScreen(
-                shotId = pageStates.getInt("shot_id"),
-                onBack = {
-                navController.popBackStack()
-            })
+                // 如果 shotId 为 null，显示0。
+                shotId = shotId ?: 0,
+                onBack = { navController.popBackStack() }
+            )
         }
+    }
+}
 
-        // Assets 页面
+/**
+ * "Assets" 标签页的独立导航容器
+ * @param viewModel 共享的 ViewModel，用于跨屏幕传递数据
+ */
+@Composable
+fun AssetsNavHost(viewModel: SharedViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "assets") {
         composable("assets") {
-            onRouteChanged("assets")
             AssetsScreen { storyId ->
-                pageStates.putInt("story_id", storyId)
+                viewModel.selectStory(storyId)
                 navController.navigate("preview")
             }
         }
-
-        // Preview 页面
         composable("preview") {
-            onRouteChanged("preview")
+            val storyId by viewModel.storyId.collectAsStateWithLifecycle()
             PreviewScreen(
-                storyId = pageStates.getInt("story_id"),
-                onBack = { navController.popBackStack() } // 返回AssetsScreen
+                // 如果 storyId 为 null，显示0。
+                storyId = storyId ?: 0,
+                onBack = { navController.popBackStack() }
             )
         }
     }
