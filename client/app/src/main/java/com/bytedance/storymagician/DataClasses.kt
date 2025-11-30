@@ -2,6 +2,7 @@ package com.bytedance.storymagician
 
 
 data class CreateStoryRequest(
+    val title: String,
     val description: String,
     val style: String
 )

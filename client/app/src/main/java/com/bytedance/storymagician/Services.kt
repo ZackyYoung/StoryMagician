@@ -10,34 +10,34 @@ import retrofit2.http.Path
 
 interface AppService {
     // 生成一个新的story
-    @POST("/story")
-    suspend fun postStory(@Body createStoryRequest: CreateStoryRequest): Response<ResponseBody>
+    @POST("story")
+    suspend fun postStory(@Body createStoryRequest: CreateStoryRequest): Int
 
     // 获取所有的story
-    @GET("/story")
+    @GET("story")
     suspend fun getStories(): List<Story>
 
     // 获取一个story下的所有shots
-    @GET("/story/{storyId}/shots")
+    @GET("story/{storyId}/shots")
     suspend fun getShots(@Path("storyId") storyId: Int): List<Shot>
 
     // 通过storyId获取一个story相关的内容
-    @GET("/story/{storyId}")
+    @GET("story/{storyId}")
     suspend fun getStory(@Path("storyId") storyId: Int): Story
 
     // 通过storyId删除一个story
-    @DELETE("/story/{storyId}")
+    @DELETE("story/{storyId}")
     suspend fun deleteStory(@Path("storyId") storyId: Int): Response<ResponseBody>
 
     // 通过shotId获取一个shot的详细内容
-    @GET("/shot/{shotId}")
+    @GET("shot/{shotId}")
     suspend fun getShot(@Path("shotId") shotId: Int): Shot
 
     // 更改shot的详细内容，并返回更新后的内容， 包括 narration，transition，description，以及新的图片
-    @POST("/shot")
+    @POST("shot")
     suspend fun postShot(@Body shot: Shot): Shot
 
     //根据storyId获取生成的视频
-    @GET("/preview/{storyId}")
+    @GET("preview/{storyId}")
     suspend fun getPreview(@Path("storyId") storyId: Int): Response<ResponseBody>
 }

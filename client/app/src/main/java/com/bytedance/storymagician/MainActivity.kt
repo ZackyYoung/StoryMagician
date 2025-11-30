@@ -36,7 +36,6 @@ fun StoryMagicianApp() {
     val sharedViewModel: SharedViewModel = viewModel()
     val pagerState = rememberPagerState { 2 }
     val coroutineScope = rememberCoroutineScope()
-    val appService = ServiceCreator.create(AppService::class.java)
     Scaffold(
         bottomBar = {
             BottomNavigationBar(

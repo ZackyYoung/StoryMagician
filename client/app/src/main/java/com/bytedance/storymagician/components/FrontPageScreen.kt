@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -29,16 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bytedance.storymagician.CreateStoryRequest
 
 @Composable
-fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
+fun FrontPageScreen(onGenerateStoryboard: (createStoryRequest: CreateStoryRequest) -> Unit) {
+    var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-
-    // 定义状态来跟踪选中的chip
     var selectedStyle by remember { mutableStateOf("Movie") }
-
-    // 定义chip样式类型
     val styles = listOf("Movie", "Animation", "Realistic")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,6 +57,25 @@ fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
+        // Title TextField
+        TextField(
+            value = title,
+            onValueChange = { title = it },
+            placeholder = { Text("Enter your title...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp), // Add some space below the title
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            singleLine = true // Title should be single line
+        )
+
+        // Description TextField
         TextField(
             value = description,
             onValueChange = { description = it },
@@ -101,7 +117,7 @@ fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = onGenerateStoryboard,
+            onClick = { onGenerateStoryboard(CreateStoryRequest(title, description, selectedStyle)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -129,5 +145,5 @@ fun FrontPageScreen(onGenerateStoryboard: () -> Unit) {
 @Preview
 @Composable
 fun FrontPageScreenPreview() {
-    FrontPageScreen(onGenerateStoryboard = {})
+    FrontPageScreen(onGenerateStoryboard = { createStoryRequest -> })
 }
