@@ -21,5 +21,5 @@ data class Story(
     val id: Int,
     val title: String,
     val date: String,
-    val coverRes: Int = R.drawable.placeholder // 将来这里可能改成后端传来的封面图URL或本地缓存路径
+    val coverRes: String = "" // 将来这里可能改成后端传来的封面图URL或本地缓存路径
 )

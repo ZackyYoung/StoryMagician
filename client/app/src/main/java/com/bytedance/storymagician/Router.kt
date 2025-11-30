@@ -1,10 +1,8 @@
 package com.bytedance.storymagician
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,8 +16,6 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 @Composable
 fun CreateNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
-
-
     NavHost(navController = navController, startDestination = "front_page") {
         composable("front_page") {
             FrontPageScreen(onGenerateStoryboard = { createStoryRequest ->
@@ -28,7 +24,6 @@ fun CreateNavHost(viewModel: SharedViewModel) {
             })
         }
         composable("storyboard") {
-            // The storyId is already collected above, so we can use it directly.
             val storyId by viewModel.storyId.collectAsStateWithLifecycle()
             StoryboardScreen(
                 storyId = storyId ?: 0,
@@ -54,7 +49,8 @@ fun AssetsNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "assets") {
         composable("assets") {
-            AssetsScreen { storyId ->
+            viewModel.fetchStories()
+            AssetsScreen(viewModel = viewModel) { storyId ->
                 viewModel.selectStory(storyId)
                 navController.navigate("preview")
             }

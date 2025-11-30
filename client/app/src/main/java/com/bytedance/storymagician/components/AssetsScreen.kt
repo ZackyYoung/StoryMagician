@@ -14,14 +14,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.bytedance.storymagician.Story
+import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 @Composable
-fun AssetsScreen(onStoryClick: (Int) -> Unit) {
+fun AssetsScreen(viewModel: SharedViewModel, onStoryClick: (Int) -> Unit) {
     var searchText by remember { mutableStateOf("") }
+    val allStories by viewModel.stories.collectAsStateWithLifecycle()
+
+    // Filter stories based on search text
+    val filteredStories = remember(searchText, allStories) {
+        if (searchText.isBlank()) {
+            allStories
+        } else {
+            allStories.filter {
+                it.title.contains(searchText, ignoreCase = true)
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -58,9 +74,9 @@ fun AssetsScreen(onStoryClick: (Int) -> Unit) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(getStories()) { story ->
+                items(filteredStories) { story ->
                     StoryCard(story) {
-                        onStoryClick(story.id) // 点击回调
+                        onStoryClick(story.id)
                     }
                 }
             }
@@ -75,7 +91,7 @@ fun StoryCard(story: Story, onClick: () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() } // 整个Card可点击
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -83,11 +99,14 @@ fun StoryCard(story: Story, onClick: () -> Unit) {
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
+            // Use AsyncImage to load the image from the URL
+            AsyncImage(
+                model = story.coverRes,
+                contentDescription = story.title, // Provide a meaningful content description
                 modifier = Modifier
                     .size(50.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE0E0E0))
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop // Crop the image to fill the bounds
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
@@ -104,22 +123,4 @@ fun StoryCard(story: Story, onClick: () -> Unit) {
             }
         }
     }
-}
-
-
-
-fun getStories(): List<Story> {
-    return listOf(
-        Story(1, "Camping Adventure", "Apr 21, 2024"),
-        Story(2, "Sunset at the Summit", "Apr 21, 2024"),
-        Story(3, "Journey Through Woods", "Apr 20, 2024"),
-        Story(4, "Mountain Hiking", "Apr 19, 2024"),
-        Story(5, "Forest Exploration", "Apr 18, 2024"),
-        Story(6, "Beach Vacation", "Apr 17, 2024"),
-        Story(7, "City Tour", "Apr 16, 2024"),
-        Story(8, "Night Photography", "Apr 15, 2024"),
-        Story(9, "Winter Sports", "Apr 14, 2024"),
-        Story(10, "Spring Festival", "Apr 13, 2024")
-        //这些是样例，到时候应该是数据库导入进来的
-    )
 }
