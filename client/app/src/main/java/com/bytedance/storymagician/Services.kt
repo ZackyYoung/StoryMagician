@@ -18,8 +18,12 @@ interface AppService {
     suspend fun getStories(): List<Story>
 
     // 获取一个story下的所有shots
+    //@GET("story/{storyId}/shots")
+    //suspend fun getShots(@Path("storyId") storyId: Int): List<Shot>
+
     @GET("story/{storyId}/shots")
-    suspend fun getShots(@Path("storyId") storyId: Int): List<Shot>
+    // 核心修改：返回类型改为 ShotResponse
+    suspend fun getShots(@Path("storyId") storyId: Int): ShotResponse
 
     // 通过storyId获取一个story相关的内容
     @GET("story/{storyId}")
