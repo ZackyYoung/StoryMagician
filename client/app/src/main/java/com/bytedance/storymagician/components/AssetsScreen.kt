@@ -46,7 +46,7 @@ fun AssetsScreen(viewModel: SharedViewModel, onStoryClick: (Int) -> Unit) {
                 .padding(10.dp)
         ) {
             Text(
-                text = "StoryFlow",
+                text = "StoryMagician",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,

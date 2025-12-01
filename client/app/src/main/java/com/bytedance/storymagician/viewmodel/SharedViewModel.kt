@@ -18,15 +18,14 @@ class SharedViewModel : ViewModel() {
     private val _shotId = MutableStateFlow<Int?>(null)
     val shotId = _shotId.asStateFlow()
 
-    // Holds the list of stories for the Assets screen
     private val _stories = MutableStateFlow<List<Story>>(emptyList())
     val stories = _stories.asStateFlow()
 
+    private val _videoUrl = MutableStateFlow<String?>(null)
+    val videoUrl = _videoUrl.asStateFlow()
+
     private val appService: AppService = ServiceCreator.create()
 
-    /**
-     * Fetches the list of stories from the backend.
-     */
     fun fetchStories() {
         viewModelScope.launch {
             try {
@@ -34,8 +33,21 @@ class SharedViewModel : ViewModel() {
                 Log.d("SharedViewModel", "Successfully fetched stories.")
             } catch (e: Exception) {
                 Log.e("SharedViewModel", "Failed to fetch stories", e)
-                // In a real app, you might want to expose an error state to the UI
-                _stories.value = emptyList() // Clear list on error
+                _stories.value = emptyList()
+            }
+        }
+    }
+
+    fun fetchVideoUrl() {
+        viewModelScope.launch {
+            try {
+                // Assuming getPreview returns a class/object that contains the video URL
+                val response = appService.getPreview(storyId.value ?: 0)
+                _videoUrl.value = response // Adjust based on your actual response structure
+                Log.d("SharedViewModel", "Fetched video URL: $response")
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to fetch video URL", e)
+                _videoUrl.value = null
             }
         }
     }

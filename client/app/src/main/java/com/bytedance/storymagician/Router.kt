@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.Observer // <--- 新增导入
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,8 +23,6 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 @Composable
 fun CreateNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
-
-
     NavHost(navController = navController, startDestination = "front_page") {
         composable("front_page") {
             FrontPageScreen(onGenerateStoryboard = { createStoryRequest ->
@@ -32,9 +31,6 @@ fun CreateNavHost(viewModel: SharedViewModel) {
             })
         }
 
-        // =========================================================
-        //                 🚀 Storyboard 路由修改
-        // =========================================================
         composable("storyboard") { navBackStackEntry -> // 必须接收 navBackStackEntry
             val storyId by viewModel.storyId.collectAsStateWithLifecycle()
 
@@ -83,9 +79,6 @@ fun CreateNavHost(viewModel: SharedViewModel) {
             )
         }
 
-        // =========================================================
-        //                🚀 ShotDetail 路由修改
-        // =========================================================
         composable("shot_detail") {
             val shotId by viewModel.shotId.collectAsStateWithLifecycle()
 
@@ -107,7 +100,7 @@ fun CreateNavHost(viewModel: SharedViewModel) {
             val storyId by viewModel.storyId.collectAsStateWithLifecycle()
 
             PreviewScreen(
-                storyId = storyId,
+                viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -120,15 +113,16 @@ fun AssetsNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "assets") {
         composable("assets") {
-            AssetsScreen { storyId ->
+            viewModel.fetchStories()
+            AssetsScreen(viewModel = viewModel) { storyId ->
                 viewModel.selectStory(storyId)
                 navController.navigate("preview")
             }
         }
         composable("preview") {
-            val storyId by viewModel.storyId.collectAsStateWithLifecycle()
+            viewModel.fetchVideoUrl()
             PreviewScreen(
-                storyId = storyId ?: 0,
+                viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )
         }

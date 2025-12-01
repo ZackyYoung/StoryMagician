@@ -41,7 +41,7 @@ interface AppService {
     @POST("shot")
     suspend fun postShot(@Body shot: Shot): Shot
 
-    //根据storyId获取生成的视频
+    //根据storyId获取生成的视频url
     @GET("preview/{storyId}")
-    suspend fun getPreview(@Path("storyId") storyId: Int): Response<ResponseBody>
+    suspend fun getPreview(@Path("storyId") storyId: Int): String
 }
