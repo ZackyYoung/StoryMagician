@@ -104,10 +104,9 @@ fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
                             .setDescription("Downloading your story video...")
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                             .setDestinationInExternalPublicDir(Environment.DIRECTORY_MOVIES, fileName)
-                            .setAllowedOverMetered(true)
                             // 允许在蜂窝网络下下载
                             .setAllowedOverMetered(true)
-                            // 【推荐添加】允许在漫游网络下下载，增加下载成功率
+                            // 允许在漫游网络下下载，增加下载成功率
                             .setAllowedOverRoaming(true)
                         downloadManager.enqueue(request)
                         Toast.makeText(context, "Download started. Check notifications for progress.", Toast.LENGTH_LONG).show()

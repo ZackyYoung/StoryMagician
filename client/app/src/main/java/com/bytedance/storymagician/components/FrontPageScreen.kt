@@ -101,7 +101,7 @@ fun FrontPageScreen(
                 FilterChip(
                     selected = selectedStyle == style,
                     onClick = { selectedStyle = style },
-                    label = { Text(style, fontSize = 20.sp) },
+                    label = { Text(style, fontSize = 15.sp) },
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.padding(4.dp)
                 )
