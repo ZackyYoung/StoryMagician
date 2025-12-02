@@ -18,6 +18,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.bytedance.storymagician.Story
@@ -27,6 +30,9 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 fun AssetsScreen(viewModel: SharedViewModel, onStoryClick: (Int) -> Unit) {
     var searchText by remember { mutableStateOf("") }
     val allStories by viewModel.stories.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
 
     // Filter stories based on search text
     val filteredStories = remember(searchText, allStories) {
@@ -116,7 +122,7 @@ fun StoryCard(story: Story, onClick: () -> Unit) {
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = story.date,
+                    text = story.updatedAt,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )

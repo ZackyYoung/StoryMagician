@@ -43,6 +43,11 @@ data class Shot(
 data class Story(
     val id: Int,
     val title: String,
-    val date: String,
-    val coverRes: String = "" // <--- 更改: 存储后端传来的封面图 URL // 将来这里可能改成后端传来的封面图URL或本地缓存路径
+    val status: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("updated_at")
+    val updatedAt: String = "",
+    @SerializedName("cover_url")
+    val coverRes: String = ""
 )

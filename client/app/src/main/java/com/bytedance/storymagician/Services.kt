@@ -16,7 +16,7 @@ interface AppService {
     suspend fun createStory(@Body createStoryRequest: CreateStoryRequest): JsonObject
 
     // 获取所有的story
-    @GET("story/")
+    @GET("stories/storyList/")
     suspend fun getStories(): List<Story>
 
     @GET("stories/sceneList/")

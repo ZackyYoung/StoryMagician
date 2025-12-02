@@ -65,26 +65,6 @@ class SharedViewModel : ViewModel() {
     }
 
 
-    fun fetchShots(storyId: Int) {
-        viewModelScope.launch {
-            try {
-                _shots.value = appService.getShots(storyId)
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to fetch shots", e)
-            }
-        }
-    }
-
-    fun fetchShotDetails(shotId: Int) {
-        viewModelScope.launch {
-            try {
-                _selectedShot.value = appService.getShot(shotId)
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to fetch shot details", e)
-            }
-        }
-    }
-
     fun updateShot(regenerateShotRequest: RegenerateShotRequest) {
         viewModelScope.launch {
             try {
@@ -113,7 +93,13 @@ class SharedViewModel : ViewModel() {
     fun fetchStories() {
         viewModelScope.launch {
             try {
-                _stories.value = appService.getStories()
+                val allStories = appService.getStories()
+                for(story in allStories) {
+                    if(story.status == "done"){
+                        _stories.value += story
+                    }
+                }
+                Log.d("SharedViewModel", "Stories fetched successfully!")
             } catch (e: Exception) {
                 Log.e("SharedViewModel", "Failed to fetch stories", e)
             }
