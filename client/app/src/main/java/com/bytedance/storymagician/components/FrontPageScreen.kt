@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import com.bytedance.storymagician.CreateStoryRequest
 import com.bytedance.storymagician.viewmodel.CreateStoryUiState
 import com.bytedance.storymagician.viewmodel.SharedViewModel
@@ -29,7 +30,6 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
     var description by remember { mutableStateOf("") }
     var selectedStyle by remember { mutableStateOf("Movie") }
     val styles = listOf("Movie", "Animation", "Realistic")
-
     val uiState by viewModel.createStoryUiState.collectAsStateWithLifecycle()
 
     Column(
@@ -104,9 +104,11 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-        
+
         Button(
-            onClick = { viewModel.createStory(CreateStoryRequest(title, description, selectedStyle)) },
+            onClick = {
+                viewModel.createStory(CreateStoryRequest(title, description, selectedStyle))
+            },
             enabled = uiState !is CreateStoryUiState.Loading, // Disable button while loading
             modifier = Modifier
                 .fillMaxWidth()
@@ -132,14 +134,20 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
                 title = { Text("Generating Storyboard") },
-                text = { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("This may take a moment, please wait...")
-                } },
+                text = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("This may take a moment, please wait...")
+                    }
+                },
                 confirmButton = {}
             )
         }
+
         is CreateStoryUiState.Error -> {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissCreateStoryError() },
@@ -152,7 +160,9 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
                 }
             )
         }
-        is CreateStoryUiState.Idle -> { /* Do nothing */ }
+
+        is CreateStoryUiState.Idle -> { /* Do nothing */
+        }
     }
 }
 

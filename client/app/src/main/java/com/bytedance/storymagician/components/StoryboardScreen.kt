@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.bytedance.storymagician.Shot
 import com.bytedance.storymagician.viewmodel.CreateStoryUiState
@@ -25,10 +26,13 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 fun StoryboardScreen(
     viewModel: SharedViewModel,
     onShotClick: (Int) -> Unit,
-    onBack: () -> Unit,
-    onGenerateVideo: () -> Unit
+    onBack: () -> Unit
 ) {
     val shots by viewModel.shots.collectAsStateWithLifecycle()
+    var expanded by remember { mutableStateOf(false) }
+    var transition by remember { mutableStateOf("none") }
+    val uiState by viewModel.createStoryUiState.collectAsStateWithLifecycle()
+    val navController = rememberNavController()
 
     Column(
         Modifier
@@ -47,6 +51,45 @@ fun StoryboardScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
+        Text(
+            text = "Transition Type",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Box {
+            OutlinedTextField(
+                value = transition,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+                    }
+                }
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("none") },
+                    onClick = {
+                        transition = "none"
+                        expanded = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text("fade") },
+                    onClick = {
+                        transition = "fade"
+                        expanded = false
+                    }
+                )
+            }
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -61,7 +104,8 @@ fun StoryboardScreen(
 
         Button(
             onClick = {
-                onGenerateVideo()
+                viewModel.generateVideo(viewModel.storyBoardStoryId.value!!, transition)
+                navController.navigate("assets")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,7 +114,34 @@ fun StoryboardScreen(
             Text("Generate Video", fontSize = 25.sp)
         }
     }
-
+    // Handle UI state for loading and error
+    when (val state = uiState) {
+        is CreateStoryUiState.Loading -> {
+            AlertDialog(
+                onDismissRequest = { /* Cannot be dismissed */ },
+                title = { Text("Generating Video") },
+                text = { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("This may take a moment, please wait...")
+                } },
+                confirmButton = {}
+            )
+        }
+        is CreateStoryUiState.Error -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissCreateStoryError() },
+                title = { Text("Error") },
+                text = { Text(state.message) },
+                confirmButton = {
+                    Button(onClick = { viewModel.dismissCreateStoryError() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+        is CreateStoryUiState.Idle -> { /* Do nothing */ }
+    }
 }
 
 @Composable

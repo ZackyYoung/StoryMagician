@@ -32,7 +32,7 @@ import androidx.core.net.toUri
 @Composable
 fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
     val videoUrl by viewModel.videoUrl.collectAsStateWithLifecycle()
-    val storyId by viewModel.storyId.collectAsStateWithLifecycle()
+    val previewStoryId by viewModel.previewStoryId.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val exoPlayer = remember {
@@ -97,7 +97,7 @@ fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
                 videoUrl?.let { url ->
                     try {
                         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                        val fileName = "Story-${storyId ?: System.currentTimeMillis()}.mp4"
+                        val fileName = "Story-${previewStoryId ?: System.currentTimeMillis()}.mp4"
 
                         val request = DownloadManager.Request(url.toUri())
                             .setTitle(fileName)
@@ -105,7 +105,10 @@ fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
                             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                             .setDestinationInExternalPublicDir(Environment.DIRECTORY_MOVIES, fileName)
                             .setAllowedOverMetered(true)
-
+                            // 允许在蜂窝网络下下载
+                            .setAllowedOverMetered(true)
+                            // 【推荐添加】允许在漫游网络下下载，增加下载成功率
+                            .setAllowedOverRoaming(true)
                         downloadManager.enqueue(request)
                         Toast.makeText(context, "Download started. Check notifications for progress.", Toast.LENGTH_LONG).show()
 
@@ -120,7 +123,7 @@ fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
-            Text("Export Video")
+            Text("Export Video", fontSize = 25.sp)
         }
     }
 }

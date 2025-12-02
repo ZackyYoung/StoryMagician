@@ -17,22 +17,18 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 @Composable
 fun CreateNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
-    val storyId by viewModel.storyId.collectAsStateWithLifecycle()
+    val storyBoardStoryId by viewModel.storyBoardStoryId.collectAsStateWithLifecycle()
     val videoUrl by viewModel.videoUrl.collectAsStateWithLifecycle()
 
     // Navigate to storyboard when a story is created/selected
-    LaunchedEffect(storyId) {
-        storyId?.let {
+    LaunchedEffect(storyBoardStoryId) {
+        storyBoardStoryId?.let {
             if (navController.currentDestination?.route != "storyboard") {
                 navController.navigate("storyboard")
             }
         }
     }
 
-    // Navigate to preview when a video URL is ready
-    LaunchedEffect(videoUrl) {
-        videoUrl?.let { navController.navigate("preview") }
-    }
 
     NavHost(navController = navController, startDestination = "front_page") {
         composable("front_page") {
@@ -45,8 +41,7 @@ fun CreateNavHost(viewModel: SharedViewModel) {
                     viewModel.selectShot(shotId)
                     navController.navigate("shot_detail")
                 },
-                onBack = { navController.popBackStack() },
-                onGenerateVideo = { storyId?.let { viewModel.generatePreviewVideo(it) } }
+                onBack = { navController.popBackStack() }
             )
         }
         composable("shot_detail") {
@@ -74,7 +69,9 @@ fun AssetsNavHost(viewModel: SharedViewModel) {
                 viewModel.fetchStories()
             }
             AssetsScreen(viewModel = viewModel) { storyId ->
-                viewModel.selectStory(storyId)
+                viewModel.selectPreviewStory(storyId)
+                viewModel.getPreviewVideo(storyId)
+                navController.navigate("preview")
             }
         }
 

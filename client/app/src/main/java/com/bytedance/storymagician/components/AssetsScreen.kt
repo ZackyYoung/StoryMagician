@@ -31,7 +31,6 @@ fun AssetsScreen(viewModel: SharedViewModel, onStoryClick: (Int) -> Unit) {
     var searchText by remember { mutableStateOf("") }
     val allStories by viewModel.stories.collectAsStateWithLifecycle()
 
-    val lifecycleOwner = LocalLifecycleOwner.current
 
 
     // Filter stories based on search text

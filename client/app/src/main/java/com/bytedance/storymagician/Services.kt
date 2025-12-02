@@ -22,23 +22,26 @@ interface AppService {
     @GET("stories/sceneList/")
     suspend fun getShots(@Query("id") storyId: Int): List<Shot>
 
-    // 通过storyId获取一个story相关的内容
-    @GET("story/{storyId}/")
-    suspend fun getStory(@Path("storyId") storyId: Int): Story
+//    // 通过storyId获取一个story相关的内容
+//    @GET("story/{storyId}/")
+//    suspend fun getStory(@Path("storyId") storyId: Int): Story
 
-    // 通过storyId删除一个story
-    @DELETE("story/{storyId}/")
-    suspend fun deleteStory(@Path("storyId") storyId: Int): Response<ResponseBody>
+//    // 通过storyId删除一个story
+//    @DELETE("story/{storyId}/")
+//    suspend fun deleteStory(@Path("storyId") storyId: Int): Response<ResponseBody>
 
     // 通过shotId获取一个shot的详细内容
-    @GET("scenes/detail/{id}/")
-    suspend fun getShot(@Path("id") shotId: Int): Shot
+//    @GET("scenes/detail/{id}/")
+//    suspend fun getShot(@Path("id") shotId: Int): Shot
 
     // 更改shot的详细内容，并返回更新后的内容， 包括 narration，transition，description，以及新的图片
     @POST("scenes/generate/")
     suspend fun postShot(@Body regenerateShotRequest: RegenerateShotRequest): Response<ResponseBody>
 
     //根据storyId获取生成的视频url
-    @GET("preview/{storyId}/")
-    suspend fun getPreview(@Path("storyId") storyId: Int): String
+    @GET("videos/detail/{story_id}")
+    suspend fun getPreview(@Path("story_id") storyId: Int): JsonObject
+
+    @POST("videos/generate/")
+    suspend fun generateVideo(@Query("id") storyId: Int, @Query("transition") transition: String): Response<ResponseBody>
 }
