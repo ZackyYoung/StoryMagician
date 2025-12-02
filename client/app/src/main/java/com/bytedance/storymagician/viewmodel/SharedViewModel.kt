@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 // Sealed interface to represent the UI state for the story creation process
-sealed interface CreateStoryUiState {
-    object Idle : CreateStoryUiState
-    object Loading : CreateStoryUiState
-    data class Error(val message: String) : CreateStoryUiState
+sealed interface UiState {
+    object Idle : UiState
+    object Loading : UiState
+    data class Error(val message: String) : UiState
+    data class Success(val message: String) : UiState
 }
 
 class SharedViewModel : ViewModel() {
@@ -36,40 +37,42 @@ class SharedViewModel : ViewModel() {
     val selectedShot = _selectedShot.asStateFlow()
 
     // State for the creation process UI
-    private val _createStoryUiState = MutableStateFlow<CreateStoryUiState>(CreateStoryUiState.Idle)
-    val createStoryUiState = _createStoryUiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UiState>(UiState.Idle)
+    val uiState = _uiState.asStateFlow()
+
 
     private val appService: AppService = ServiceCreator.create()
 
     fun createStory(createStoryRequest: CreateStoryRequest) {
         viewModelScope.launch {
             // Set state to Loading to show progress bar on the UI
-            _createStoryUiState.value = CreateStoryUiState.Loading
+            _uiState.value = UiState.Loading
             try {
                 val responseJson = appService.createStory(createStoryRequest)
                 val newStoryId = responseJson.get("story_id").asInt
-
                 Log.d("SharedViewModel", "Story task submitted with ID: $newStoryId. Starting to poll for shots.")
                 pollForShots(newStoryId)
 
             } catch (e: Exception) {
                 Log.e("SharedViewModel", "Failed to create story", e)
-                _createStoryUiState.value = CreateStoryUiState.Error("Failed to submit story creation task.")
+                _uiState.value = UiState.Error("Failed to submit story creation task.")
             }
         }
     }
 
 
     
-    fun dismissCreateStoryError() {
-        _createStoryUiState.value = CreateStoryUiState.Idle
+    fun dismissAlert() {
+        _uiState.value = UiState.Idle
     }
 
-
+    fun onPreviewNavigated() {
+        _previewStoryId.value = null
+    }
     fun updateShot(regenerateShotRequest: RegenerateShotRequest) {
         viewModelScope.launch {
             try {
-                _createStoryUiState.value = CreateStoryUiState.Loading
+                _uiState.value = UiState.Loading
                 appService.postShot(regenerateShotRequest)
                 pollForShots(storyBoardStoryId.value!!)
                 selectShot(regenerateShotRequest.id)
@@ -83,6 +86,7 @@ class SharedViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
+                _uiState.value = UiState.Loading
                 appService.generateVideo(storyId, transition)
                 getPreviewVideo(storyId)
             } catch (e: Exception) {
@@ -117,14 +121,6 @@ class SharedViewModel : ViewModel() {
         }
     }
 
-    fun selectStoryBoardStory(id: Int) {
-        _storyBoardStoryId.value = id
-    }
-
-    fun selectPreviewStory(id: Int) {
-        _previewStoryId.value = id
-        _videoUrl.value = null
-    }
 
     fun selectShot(id: Int) {
         _selectedShot.value = shots.value.find { it.id == id }
@@ -149,7 +145,7 @@ class SharedViewModel : ViewModel() {
                     if (flag) {
                         _shots.value = fetchedShots
                         _storyBoardStoryId.value = storyId // This will trigger navigation
-                        _createStoryUiState.value = CreateStoryUiState.Idle // Hide progress bar
+                        _uiState.value = UiState.Idle // Hide progress bar
                         Log.d("SharedViewModel", "Shots fetched successfully!")
                         return // Success
                     }
@@ -161,20 +157,20 @@ class SharedViewModel : ViewModel() {
         }
 
         Log.w("SharedViewModel", "Polling for shots timed out.")
-        _createStoryUiState.value = CreateStoryUiState.Error("Loading storyboard timed out. Please try again later.")
+        _uiState.value = UiState.Error("Loading storyboard timed out. Please try again later.")
     }
 
     private suspend fun pollForVideo(storyId: Int) {
-        val maxRetries = 20 // Poll for up to 45 seconds (20 * 3s)
-        val delayMillis = 6000L // 6 seconds
+        val maxRetries = 30 // Poll for up to 120 seconds (30 * 4s)
+        val delayMillis = 4000L // 6 seconds
         repeat(maxRetries) { attempt ->
             Log.d("SharedViewModel", "Polling for video... Attempt ${attempt + 1}/$maxRetries")
             try {
-                _createStoryUiState.value = CreateStoryUiState.Loading
                 val videoUrl = appService.getPreview(storyId).get("video_url").asString
                 if (videoUrl.isNotEmpty()) {
                     _videoUrl.value = videoUrl
-                    _createStoryUiState.value = CreateStoryUiState.Idle // Hide progress bar
+                    _previewStoryId.value = storyId
+                    _uiState.value = UiState.Success("Video generated successfully!You can find it in the assets.")
                     Log.d("SharedViewModel", "Video fetched successfully!")
                     return // Success
                 }
@@ -184,7 +180,7 @@ class SharedViewModel : ViewModel() {
             delay(delayMillis)
         }
         Log.w("SharedViewModel", "Polling for video timed out.")
-        _createStoryUiState.value =
-            CreateStoryUiState.Error("Loading video timed out. Please try again later.")
+        _uiState.value =
+            UiState.Error("Loading video timed out. Please try again later.")
     }
 }

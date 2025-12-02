@@ -1,6 +1,5 @@
 package com.bytedance.storymagician.components
 
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,14 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.bytedance.storymagician.RegenerateShotRequest
-import com.bytedance.storymagician.viewmodel.CreateStoryUiState
+import com.bytedance.storymagician.viewmodel.UiState
 import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 @Composable
@@ -29,7 +27,7 @@ fun ShotDetailScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
     val shot by viewModel.selectedShot.collectAsStateWithLifecycle()
     var descriptionText by remember(shot) { mutableStateOf(shot!!.description) }
     var narrationText by remember(shot){ mutableStateOf(shot!!.narration) }
-    val uiState by viewModel.createStoryUiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,30 +102,31 @@ fun ShotDetailScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
         }
     }
     when (val state = uiState) {
-        is CreateStoryUiState.Loading -> {
+        is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
                 title = { Text("Regenerating Shots") },
                 text = { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("This may take a moment, please wait...")
+                    Text("This may take a moment, please wait...", fontSize = 14.sp, textAlign = TextAlign.Center)
                 } },
                 confirmButton = {}
             )
         }
-        is CreateStoryUiState.Error -> {
+        is UiState.Error -> {
             AlertDialog(
-                onDismissRequest = { viewModel.dismissCreateStoryError() },
+                onDismissRequest = { viewModel.dismissAlert() },
                 title = { Text("Error") },
-                text = { Text(state.message) },
+                text = { Text(state.message, fontSize = 14.sp, textAlign = TextAlign.Center) },
                 confirmButton = {
-                    Button(onClick = { viewModel.dismissCreateStoryError() }) {
+                    Button(onClick = { viewModel.dismissAlert() }) {
                         Text("OK")
                     }
                 }
             )
         }
-        is CreateStoryUiState.Idle -> { /* Do nothing */ }
+        is UiState.Success ->{}
+        is UiState.Idle -> {}
     }
 }

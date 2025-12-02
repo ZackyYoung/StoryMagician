@@ -17,22 +17,13 @@ import com.bytedance.storymagician.viewmodel.SharedViewModel
 @Composable
 fun CreateNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
-    val storyBoardStoryId by viewModel.storyBoardStoryId.collectAsStateWithLifecycle()
-    val videoUrl by viewModel.videoUrl.collectAsStateWithLifecycle()
-
-    // Navigate to storyboard when a story is created/selected
-    LaunchedEffect(storyBoardStoryId) {
-        storyBoardStoryId?.let {
-            if (navController.currentDestination?.route != "storyboard") {
-                navController.navigate("storyboard")
-            }
-        }
-    }
 
 
     NavHost(navController = navController, startDestination = "front_page") {
         composable("front_page") {
-            FrontPageScreen(viewModel = viewModel)
+            FrontPageScreen(
+                viewModel = viewModel,
+                onGenerateStoryBoard = { navController.navigate("storyboard") })
         }
         composable("storyboard") {
             StoryboardScreen(
@@ -41,17 +32,12 @@ fun CreateNavHost(viewModel: SharedViewModel) {
                     viewModel.selectShot(shotId)
                     navController.navigate("shot_detail")
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onFinishGeneration = { navController.popBackStack() }
             )
         }
         composable("shot_detail") {
             ShotDetailScreen(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() } 
-            )
-        }
-        composable("preview") {
-            PreviewScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )
@@ -69,7 +55,6 @@ fun AssetsNavHost(viewModel: SharedViewModel) {
                 viewModel.fetchStories()
             }
             AssetsScreen(viewModel = viewModel) { storyId ->
-                viewModel.selectPreviewStory(storyId)
                 viewModel.getPreviewVideo(storyId)
                 navController.navigate("preview")
             }

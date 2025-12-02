@@ -15,22 +15,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.bytedance.storymagician.CreateStoryRequest
-import com.bytedance.storymagician.viewmodel.CreateStoryUiState
+import com.bytedance.storymagician.viewmodel.UiState
 import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 @Composable
-fun FrontPageScreen(viewModel: SharedViewModel) {
+fun FrontPageScreen(
+    viewModel: SharedViewModel,
+    onGenerateStoryBoard: () -> Unit = {}
+) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedStyle by remember { mutableStateOf("Movie") }
     val styles = listOf("Movie", "Animation", "Realistic")
-    val uiState by viewModel.createStoryUiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
 
     Column(
         modifier = Modifier
@@ -108,8 +113,9 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
         Button(
             onClick = {
                 viewModel.createStory(CreateStoryRequest(title, description, selectedStyle))
+                onGenerateStoryBoard()
             },
-            enabled = uiState !is CreateStoryUiState.Loading, // Disable button while loading
+            enabled = uiState !is UiState.Loading, // Disable button while loading
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -130,7 +136,7 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
 
     // Handle UI state for loading and error
     when (val state = uiState) {
-        is CreateStoryUiState.Loading -> {
+        is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
                 title = { Text("Generating Storyboard") },
@@ -141,28 +147,37 @@ fun FrontPageScreen(viewModel: SharedViewModel) {
                     ) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("This may take a moment, please wait...")
+                        Text(
+                            "This may take a moment, please wait...",
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 },
                 confirmButton = {}
             )
         }
 
-        is CreateStoryUiState.Error -> {
+        is UiState.Error -> {
             AlertDialog(
-                onDismissRequest = { viewModel.dismissCreateStoryError() },
+                onDismissRequest = { viewModel.dismissAlert() },
                 title = { Text("Error") },
-                text = { Text(state.message) },
+                text = { Text(state.message, fontSize = 14.sp, textAlign = TextAlign.Center) },
                 confirmButton = {
-                    Button(onClick = { viewModel.dismissCreateStoryError() }) {
+                    Button(onClick = { viewModel.dismissAlert() }) {
                         Text("OK")
                     }
                 }
             )
         }
 
-        is CreateStoryUiState.Idle -> { /* Do nothing */
+        is UiState.Success -> {
         }
+
+        is UiState.Idle -> {
+        }
+
+
     }
 }
 

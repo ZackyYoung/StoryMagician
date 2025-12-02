@@ -13,26 +13,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.bytedance.storymagician.Shot
-import com.bytedance.storymagician.viewmodel.CreateStoryUiState
+import com.bytedance.storymagician.viewmodel.UiState
 import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 @Composable
 fun StoryboardScreen(
     viewModel: SharedViewModel,
     onShotClick: (Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onFinishGeneration: () -> Unit
 ) {
     val shots by viewModel.shots.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
     var transition by remember { mutableStateOf("none") }
-    val uiState by viewModel.createStoryUiState.collectAsStateWithLifecycle()
-    val navController = rememberNavController()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         Modifier
@@ -105,7 +106,6 @@ fun StoryboardScreen(
         Button(
             onClick = {
                 viewModel.generateVideo(viewModel.storyBoardStoryId.value!!, transition)
-                navController.navigate("assets")
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,31 +116,59 @@ fun StoryboardScreen(
     }
     // Handle UI state for loading and error
     when (val state = uiState) {
-        is CreateStoryUiState.Loading -> {
+        is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
                 title = { Text("Generating Video") },
-                text = { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("This may take a moment, please wait...")
-                } },
+                text = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "This may take a moment, please wait...",
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                },
                 confirmButton = {}
             )
         }
-        is CreateStoryUiState.Error -> {
+
+        is UiState.Error -> {
             AlertDialog(
-                onDismissRequest = { viewModel.dismissCreateStoryError() },
+                onDismissRequest = { viewModel.dismissAlert() },
                 title = { Text("Error") },
-                text = { Text(state.message) },
+                text = { Text(state.message, fontSize = 14.sp, textAlign = TextAlign.Center) },
                 confirmButton = {
-                    Button(onClick = { viewModel.dismissCreateStoryError() }) {
+                    Button(onClick = { viewModel.dismissAlert() }) {
                         Text("OK")
                     }
                 }
             )
         }
-        is CreateStoryUiState.Idle -> { /* Do nothing */ }
+
+        is UiState.Success -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissAlert() },
+                title = { Text("Success") },
+                text = { Text(state.message, fontSize = 14.sp, textAlign = TextAlign.Center) },
+                confirmButton = {
+                    Button(onClick = {
+                        viewModel.dismissAlert()
+                        onFinishGeneration()
+                    }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+
+        is UiState.Idle -> { /* Do nothing */
+        }
     }
 }
 
