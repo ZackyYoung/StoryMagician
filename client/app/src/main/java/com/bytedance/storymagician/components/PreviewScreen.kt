@@ -2,7 +2,6 @@ package com.bytedance.storymagician.components
 
 import android.app.DownloadManager
 import android.content.Context
-import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
 import androidx.compose.foundation.background

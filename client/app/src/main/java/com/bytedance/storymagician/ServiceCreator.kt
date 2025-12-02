@@ -12,9 +12,9 @@ import androidx.core.content.edit
 
 object ServiceCreator {
     //实际地址
-//    private const val BASE_URL = "http://14.103.19.244:8000/"
+    private const val BASE_URL = "http://14.103.19.244:8000/"
     //apifox mock地址
-    private const val BASE_URL = "http://10.0.2.2:4523/m1/7444033-7178068-default/"
+//    private const val BASE_URL = "http://10.0.2.2:4523/m1/7444033-7178068-default/"
 
     private const val PREFS_FILE = "story_magician_prefs"
     private const val PREF_DEVICE_ID = "device_uuid"

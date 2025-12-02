@@ -9,28 +9,31 @@ data class CreateStoryRequest(
     val style: String
 )
 
-// 新增：ShotResponse 类，匹配后端返回的 {"success":..., "shots":[...]} 结构
-data class ShotResponse(
-    val success: Boolean,
-    val shots: List<Shot>
-)
-
 data class Shot(
     val id: Int,
-    val title: String,
-    val status: String = "Not Generated",
-
-    // 后端返回的是 imageRes，使用 @SerializedName 映射到 imageUrl
-    @SerializedName("imageRes")
-    val imageUrl: String = "", // 将来这里可能改成后端传来的缩略图URL或本地缓存路径
+    @SerializedName("scene_index")
+    val sceneIndex: Int,
+    @SerializedName("prompt")
     val description: String = "",
-    val transition: String = "",
-    val narration: String = ""
+    val title: String,
+    val style: String,
+    val narration: String = "",
+    @SerializedName("image_url")
+    val imageRes: String = "",
+    @SerializedName("audio_url")
+    val audioRes: String = "",
+    val status: String = "Not Generated",
+    @SerializedName("created_at")
+    val createdAt: String = "",
+    @SerializedName("updated_at")
+    val updatedAt: String = "",
+    val info: String = "",
+    val story: Int
 )
 
 data class Story(
     val id: Int,
     val title: String,
     val date: String,
-    val coverUrl: String = "" // <--- 更改: 存储后端传来的封面图 URL // 将来这里可能改成后端传来的封面图URL或本地缓存路径
+    val coverRes: String = "" // <--- 更改: 存储后端传来的封面图 URL // 将来这里可能改成后端传来的封面图URL或本地缓存路径
 )

@@ -6,7 +6,7 @@ from ollama import generate
 
 logger = logging.getLogger(__name__)
 
-def call_ollama(prompt: str, model: str = "qwen2.5:0.5b", stream: bool = False) -> str:
+def call_ollama(prompt: str, model: str = "qwen3:4b", stream: bool = False) -> str:
     response = generate(prompt=prompt, model=model, stream=stream)
     return response['response']
 
@@ -63,7 +63,6 @@ def generate_storyboard(story_title:str, story_text: str, style: str):
                         "scene": s.get("scene", ""),
                         "prompt": s.get("prompt", ""),
                         "narration": s.get("narration", ""),
-                        "bgm": s.get("bgm")
                     })
                 return normalized
             except Exception as e:
