@@ -44,10 +44,11 @@ class SharedViewModel : ViewModel() {
             // Set state to Loading to show progress bar on the UI
             _createStoryUiState.value = CreateStoryUiState.Loading
             try {
-                val responseJson = appService.createStory(createStoryRequest)
-                val newStoryId = responseJson.get("story_id").asInt
-
-                Log.d("SharedViewModel", "Story task submitted with ID: $newStoryId. Starting to poll for shots.")
+//                val responseJson = appService.createStory(createStoryRequest)
+//                val newStoryId = responseJson.get("story_id").asInt
+//
+//                Log.d("SharedViewModel", "Story task submitted with ID: $newStoryId. Starting to poll for shots.")
+                val newStoryId = 64 // 调试用
                 pollForShots(newStoryId)
 
             } catch (e: Exception) {
@@ -55,6 +56,77 @@ class SharedViewModel : ViewModel() {
                 _createStoryUiState.value = CreateStoryUiState.Error("Failed to submit story creation task.")
             }
         }
+    }
+
+
+    
+    fun dismissCreateStoryError() {
+        _createStoryUiState.value = CreateStoryUiState.Idle
+    }
+
+
+    fun fetchShots(storyId: Int) {
+        viewModelScope.launch {
+            try {
+                _shots.value = appService.getShots(storyId)
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to fetch shots", e)
+            }
+        }
+    }
+
+    fun fetchShotDetails(shotId: Int) {
+        viewModelScope.launch {
+            try {
+                _selectedShot.value = appService.getShot(shotId)
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to fetch shot details", e)
+            }
+        }
+    }
+
+    fun updateShot(regenerateShotRequest: RegenerateShotRequest) {
+        viewModelScope.launch {
+            try {
+                _createStoryUiState.value = CreateStoryUiState.Loading
+                appService.postShot(regenerateShotRequest)
+                pollForShots(storyId.value!!)
+                selectShot(regenerateShotRequest.id)
+                Log.d("SharedViewModel", "Shot updated successfully!")
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to update shot", e)
+            }
+        }
+    }
+
+    fun generatePreviewVideo(storyId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = appService.getPreview(storyId)
+                _videoUrl.value = response
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to generate preview video", e)
+            }
+        }
+    }
+
+    fun fetchStories() {
+        viewModelScope.launch {
+            try {
+                _stories.value = appService.getStories()
+            } catch (e: Exception) {
+                Log.e("SharedViewModel", "Failed to fetch stories", e)
+            }
+        }
+    }
+
+    fun selectStory(id: Int) {
+        _storyId.value = id
+        _videoUrl.value = null
+    }
+
+    fun selectShot(id: Int) {
+        _selectedShot.value = shots.value.find { it.id == id }
     }
 
     private suspend fun pollForShots(storyId: Int) {
@@ -90,71 +162,6 @@ class SharedViewModel : ViewModel() {
         Log.w("SharedViewModel", "Polling for shots timed out.")
         _createStoryUiState.value = CreateStoryUiState.Error("Loading storyboard timed out. Please try again later.")
     }
-    
-    fun dismissCreateStoryError() {
-        _createStoryUiState.value = CreateStoryUiState.Idle
-    }
 
 
-    fun fetchShots(storyId: Int) {
-        viewModelScope.launch {
-            try {
-                _shots.value = appService.getShots(storyId)
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to fetch shots", e)
-            }
-        }
-    }
-
-    fun fetchShotDetails(shotId: Int) {
-        viewModelScope.launch {
-            try {
-                _selectedShot.value = appService.getShot(shotId)
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to fetch shot details", e)
-            }
-        }
-    }
-
-    fun updateShot(updatedShotData: Shot) {
-        viewModelScope.launch {
-            try {
-                appService.postShot(updatedShotData)
-                fetchShotDetails(updatedShotData.id)
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to update shot", e)
-            }
-        }
-    }
-
-    fun generatePreviewVideo(storyId: Int) {
-        viewModelScope.launch {
-            try {
-                val response = appService.getPreview(storyId)
-                _videoUrl.value = response
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to generate preview video", e)
-            }
-        }
-    }
-
-    fun fetchStories() {
-        viewModelScope.launch {
-            try {
-                _stories.value = appService.getStories()
-            } catch (e: Exception) {
-                Log.e("SharedViewModel", "Failed to fetch stories", e)
-            }
-        }
-    }
-
-    fun selectStory(id: Int) {
-        _storyId.value = id
-        _videoUrl.value = null
-    }
-
-    fun selectShot(id: Int) {
-        _selectedShot.value = null
-        fetchShotDetails(id)
-    }
 }

@@ -73,5 +73,12 @@ fun AssetsNavHost(viewModel: SharedViewModel) {
                 viewModel.selectStory(storyId)
             }
         }
+
+        composable("preview") {
+            PreviewScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.bytedance.storymagician.Shot
+import com.bytedance.storymagician.viewmodel.CreateStoryUiState
 import com.bytedance.storymagician.viewmodel.SharedViewModel
 
 @Composable
@@ -68,6 +70,7 @@ fun StoryboardScreen(
             Text("Generate Video", fontSize = 25.sp)
         }
     }
+
 }
 
 @Composable

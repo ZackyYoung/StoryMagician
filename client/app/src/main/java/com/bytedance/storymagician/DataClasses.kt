@@ -9,6 +9,15 @@ data class CreateStoryRequest(
     val style: String
 )
 
+data class RegenerateShotRequest(
+    val id: Int,
+    val title: String,
+    @SerializedName("prompt")
+    val description: String,
+    val narration: String
+
+)
+
 data class Shot(
     val id: Int,
     @SerializedName("scene_index")

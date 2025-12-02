@@ -31,12 +31,12 @@ interface AppService {
     suspend fun deleteStory(@Path("storyId") storyId: Int): Response<ResponseBody>
 
     // 通过shotId获取一个shot的详细内容
-    @GET("shot/{shotId}/")
-    suspend fun getShot(@Path("shotId") shotId: Int): Shot
+    @GET("scenes/detail/{id}/")
+    suspend fun getShot(@Path("id") shotId: Int): Shot
 
     // 更改shot的详细内容，并返回更新后的内容， 包括 narration，transition，description，以及新的图片
-    @POST("shot/")
-    suspend fun postShot(@Body shot: Shot): Shot
+    @POST("scenes/generate/")
+    suspend fun postShot(@Body regenerateShotRequest: RegenerateShotRequest): Response<ResponseBody>
 
     //根据storyId获取生成的视频url
     @GET("preview/{storyId}/")
