@@ -68,7 +68,11 @@ fun CreateNavHost(viewModel: SharedViewModel) {
 fun AssetsNavHost(viewModel: SharedViewModel) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "assets") {
+
         composable("assets") {
+            LaunchedEffect(Unit) { // 使用 Unit 作为 key，确保这个 effect 只执行一次
+                viewModel.fetchStories()
+            }
             AssetsScreen(viewModel = viewModel) { storyId ->
                 viewModel.selectStory(storyId)
             }
