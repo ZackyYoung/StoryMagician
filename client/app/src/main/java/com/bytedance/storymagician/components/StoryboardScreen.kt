@@ -119,7 +119,7 @@ fun StoryboardScreen(
         is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
-                title = { Text("Generating Video") },
+                title = { Text("The content is generating") },
                 text = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

@@ -97,8 +97,7 @@ fun PreviewScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
                 videoUrl?.let { url ->
                     try {
                         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                        val fileName = "Story-${previewStoryId ?: System.currentTimeMillis()}.mp4"
-
+                        val fileName = "${viewModel.stories.value.find { it.id == previewStoryId }?.title ?: "Story"}.mp4"
                         val request = DownloadManager.Request(url.toUri())
                             .setTitle(fileName)
                             .setDescription("Downloading your story video...")

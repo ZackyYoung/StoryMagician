@@ -105,7 +105,7 @@ fun ShotDetailScreen(viewModel: SharedViewModel, onBack: () -> Unit) {
         is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
-                title = { Text("Regenerating Shots") },
+                title = { Text("The content is generating") },
                 text = { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
