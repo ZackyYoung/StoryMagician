@@ -8,17 +8,8 @@ class GenerateSceneSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "prompt", "narration"]
 
 class SceneDetailSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    updated_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
     class Meta:
         model = Scene
-        fields = [
-            "id",
-            "title",
-            "prompt",
-            "narration",
-            "status",
-            "image_url",
-            "audio_url",
-            "status",
-            "created_at",
-            "updated_at",
-        ]
+        fields = "__all__"

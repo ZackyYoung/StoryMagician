@@ -1,6 +1,7 @@
 from django.utils import timezone
 from celery import shared_task
 
+from stories.models import Story
 from scenes.models import Scene
 from scenes.enums import SceneStatus
 from .api import text_to_image, text_to_audio
@@ -24,6 +25,13 @@ def generate_scene(scene_id_list: list[int]):
                 scene.status = SceneStatus.DONE.value
                 scene.updated_at = timezone.now()
                 scene.save()
+                
+                if scene.scene_index == 0:
+                    story = Story.objects.get(id=scene.story.id)
+                    if story:
+                        story.cover_url = scene.image_url
+                        story.save()
+                    
             except Exception as e:
                 scene.updated_at = timezone.now()
                 scene.status = SceneStatus.ERROR.value

@@ -8,9 +8,11 @@
 from django.db import models
 
 class Story(models.Model):
+    client_uuid = models.CharField(max_length=50, blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     style = models.CharField(max_length=255, blank=True, null=True)
+    cover_url = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)

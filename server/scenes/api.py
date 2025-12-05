@@ -16,7 +16,7 @@ def text_to_image(prompt:str, style:str):
         "prompt": prompt,
         "style": style
     }
-    response = requests.post(request_url, json=payload, timeout=60)
+    response = requests.post(request_url, json=payload, timeout=600)
     
     content_type = response.headers.get("Content-Type", "")
     ext = mimetypes.guess_extension(content_type) or ".jpg"
@@ -36,7 +36,7 @@ def text_to_audio(text: str):
         "tts_text": text
     }
 
-    response = requests.post(request_url, json=payload, timeout=60)
+    response = requests.post(request_url, json=payload, timeout=600)
     
     content_type = response.headers.get("Content-Type", "")
     ext = mimetypes.guess_extension(content_type) or ".wav"

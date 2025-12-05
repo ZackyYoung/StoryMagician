@@ -18,10 +18,11 @@ def generate_scene_prompt(story_id: int):
     story = Story.objects.get(id=story_id)
     
     try:
+        title = story.title
         description = story.description
         style = story.style
         
-        result = story_to_prompt(description, style)
+        result = story_to_prompt(title, description, style)
         shots = result['shots']
         story.status = StoryStatus.GENERATING.value
         story.updated_at = timezone.now()
