@@ -139,7 +139,7 @@ fun FrontPageScreen(
         is UiState.Loading -> {
             AlertDialog(
                 onDismissRequest = { /* Cannot be dismissed */ },
-                title = { Text("The content is generating") },
+                title = { Text("The content is generating", fontSize = 18.sp) },
                 text = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
