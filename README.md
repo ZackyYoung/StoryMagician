@@ -93,6 +93,7 @@ celery -A server worker -l info
 ## 模型服务
 ### 1 部署CosyVoice
 下载并独立部署cosyvoice模型，参考链接：https://github.com/FunAudioLLM/CosyVoice
+
 对CosyVoice/runtime/python/fastapi/server.py文件中的/inference_sft接口做如下修改
 ```python
 @app.post("/inference_sft")
@@ -117,8 +118,11 @@ async def inference_sft(req : TTSRequest):
 
 ### 2 下载大模型
 将ollama, stable diffusion turbo, stable video diffusion下载到本地，并使用ollama拉取qwen2.5:0.5b模型，参考链接：
+
 ollama：https://ollama.com/
+
 stable diffusion turbo: https://huggingface.co/stabilityai/sdxl-turbo
+
 stable video diffusion: https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt
 
 ### 3 启动model_service
