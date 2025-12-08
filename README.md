@@ -89,3 +89,73 @@ source /yourpath/venv/bin/activate
 ```bash
 celery -A server worker -l info
 ```
+
+## 模型服务
+### 1 部署CosyVoice
+下载并独立部署cosyvoice模型，参考链接：https://github.com/FunAudioLLM/CosyVoice
+对CosyVoice/runtime/python/fastapi/server.py文件中的/inference_sft接口做如下修改
+```python
+@app.post("/inference_sft")
+async def inference_sft(req : TTSRequest):
+    model_output = cosyvoice.inference_sft(req.tts_text, req.spk_id)
+    # 收集所有 PCM
+    pcm_list = []
+    for i in model_output:
+        audio = (i['tts_speech'].numpy()).astype(np.float32)
+        pcm_list.append(audio)
+
+    audio = np.concatenate(pcm_list, axis=0).squeeze()
+
+    # 写入 WAV 到内存
+    buffer = io.BytesIO()
+    sf.write(buffer, audio, samplerate=cosyvoice.sample_rate, format='WAV')
+    wav_bytes = buffer.getvalue()
+
+    return Response(content=wav_bytes, media_type="audio/wav")
+```
+启动cosyvoice等待被调用
+
+### 2 下载大模型
+将ollama, stable diffusion turbo, stable video diffusion下载到本地，并使用ollama拉取qwen2.5:0.5b模型，参考链接：
+ollama：https://ollama.com/
+stable diffusion turbo: https://huggingface.co/stabilityai/sdxl-turbo
+stable video diffusion: https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt
+
+### 3 启动model_service
+打开model_service项目，创建虚拟环境，下载对应依赖
+```bash
+conda create -n model_service python=3.12
+conda activate model_service
+pip install -r requirements.txt
+```
+启动模型服务
+```bash
+python -m uvicorn app.main:app --reload
+```
+
+### 4 配置fprc
+下载fprc，并准备frpc.ini文件
+```bash
+[common]
+server_addr = 14.103.19.244
+server_port = 7000
+
+[web]
+type = tcp
+local_port = 8000
+remote_port = 18000
+```
+启动frpc穿透
+```bash
+frpc -c frpc.ini
+```
+
+## 客户端
+### 1 构建项目
+使用gradle自动构建项目，下载必要依赖
+
+### 2 打包apk
+在android studio中选择build/build signed app bundle or apk打包成apk
+
+### 3 安装app
+将apk安装至安卓手机，模型服务和服务端启动后即可使用
