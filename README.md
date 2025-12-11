@@ -1,3 +1,13 @@
+## 架构设计
+### 1 数据库
+数据库包含如下三个表：story（故事表）、scene（分镜表）、video（视频表），具体字段如下图所示
+<img width="771" height="529" alt="image" src="https://github.com/user-attachments/assets/dd6b4d88-301d-46a2-b025-34ea62f17457" />
+### 2 服务架构
++ 服务端部署在云服务器，用于提供基础业务接口；
++ 模型端部署在本地工作站，用于提供模型服务接口（如大语言模型、文生图、文字转语音）；
++ 使用FRP内网穿透技术实现在云服务器中调用本地模型服务；
+<img width="757" height="587" alt="image" src="https://github.com/user-attachments/assets/e782aa5a-7615-48c8-acba-e0a0ff458aef" />
+
 ## 服务端
 ### 1 创建虚拟环境
 ```bash
